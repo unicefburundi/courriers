@@ -43,13 +43,22 @@ class Staff(models.Model):
     def __unicode__(self):
         return "{0} {1}".format(self.first_name, self.last_name)
 
+class MailType(models.Model):
+    '''In this model, we will store mail types'''
+    mail_type_name = models.CharField(max_length=50)
+
+    def __unicode__(self):
+        return "{0}".format(self.mail_type_name)
+
 class Mail(models.Model):
     '''In this model, we will store mails and invoices'''
     sender = models.ForeignKey(Sender)
-    mail = models.ImageField()
+    mail = models.ImageField(null=True)
+    mail_type = models.ForeignKey(MailType)
+    received_time = models.DateTimeField(auto_now_add=True, blank=True)
 
     def __unicode__(self):
-        return "{0}".format(self.sender.first_name)
+        return "{0} - Mail type : {1} - Registered {2}".format(self.sender.first_name, self.mail_type.mail_type_name, self.received_time)
 
 class track(models.Model):
     '''In this model, we will record wherever a mail went through'''
@@ -57,7 +66,7 @@ class track(models.Model):
     staff = models.ForeignKey(Staff)
     start_date = models.DateTimeField(auto_now_add=True, blank=True)
     purpose = models.CharField(max_length=100)
-    end_date = models.DateTimeField(blank=True)
+    end_date = models.DateTimeField(blank=True, null=True)
 
     def __unicode__(self):
-        return "{0} - {1} - Start {2} - End {3}".format(self.mail.sender.first_name, self.staff.first_name, self.start_date, self.end_date)
+        return "{0} [Registered {1}] - {2} - Start {3} - End {4}".format(self.mail.sender.first_name, self.mail.received_time, self.staff.first_name, self.start_date, self.end_date)

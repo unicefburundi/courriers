@@ -1,0 +1,121 @@
+{% extends "base2.html" %}
+{% load staticfiles %}
+{% load i18n %}
+{% load static %}
+
+{% block head %}
+	<script language="JavaScript">
+
+		$(document).ready(function() {
+
+			if ("{{ mail_types }}") {
+				{% for m in mail_types %}
+					$('#mail_type').append('<option value="{{ m.id }}">{{ m.mail_type_name }}</option>');
+				{% endfor %}
+			}
+
+			if ("{{ senders }}") {
+				{% for s in senders %}
+					$('#sender').append('<option value="{{ s.id }}">{{ s.first_name }} {{s.last_name}}</option>');
+				{% endfor %}
+			}
+
+		});
+
+		function saveMail() {
+
+			if ($('#mail_type').val() != ""){
+				mail_type = $('#mail_type').val();
+			}else{
+				return;
+			}
+			if ($('#sender').val() != ""){
+				sender = $('#sender').val();
+			}else{
+				return;
+			}
+
+			console.log(mail_type);
+			console.log(sender);
+
+			ajaxurl = 'save_mail';
+			data = JSON.stringify({ 'mail_type': mail_type, 'sender': sender});
+
+			ajaxpost(ajaxurl, data);
+
+		}
+
+
+		function ajaxpost(posturl, data) {
+		        ajaxresults = null;
+		        $.ajax({
+		        	beforeSend: function(xhr, settings) {
+				        if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+				            xhr.setRequestHeader("X-CSRFToken", csrftoken);
+				        }
+				    },
+		            type: 'POST',
+		            url: posturl,
+		            data: data,
+		            contentType: 'application/json; charset=utf-8',
+		            dataType: 'json',
+
+		            success: function (response) {
+		            	console.log("Success");
+		            },
+		            failure: function (json) {
+		                console.log("Fail");
+		            },
+		            error: function (jqXHR, exception) {
+		                console.log("Error");
+		            }
+		        })
+		}
+
+
+	</script>
+{% endblock %}
+
+
+{% block container %}
+
+
+	<div>
+		{% if msg %}
+			<div class="divmessage"><p>{{ msg }}</p></div>
+		{% endif %}
+		{% if err %}
+			<div class="diverror"><p>{{ err }}</p></div>
+		{% endif %}
+	</div>
+	
+	<div>
+		<div class="form-inline" style="padding-left :5px; padding-right :5px;">
+
+			<form method="post" enctype="multipart/form-data">
+			{% csrf_token %}
+
+			<div class="form-group">
+				<label for="mail_type">{% trans "Type:" %}</label>
+				<select id="mail_type" class="form-control" style="width:140px"  required="required">
+					<option value="" selected="selected">[ {% trans "Select mail type" %} ]</option>
+				</select>
+			</div>
+			
+			<div class="form-group">
+				<label for="sender">{% trans "Sender:" %}</label>
+				<select id="sender" class="form-control" style="width:140px"  required="required">
+					<option value="" selected="selected">[ {% trans "Select the sender" %} ]</option>'
+				</select>
+			</div>
+
+			<button type="submit" onclick="saveMail()">Save</button>
+
+			</form>
+
+		</div>
+
+	</div>
+
+
+{% endblock %}

@@ -3,6 +3,7 @@
 {% load i18n %}
 {% load static %}
 
+
 {% block head %}
 	<script language="JavaScript">
 
@@ -20,7 +21,66 @@
 				{% endfor %}
 			}
 
+			
+			desplay_records();
+
 		});
+
+		function desplay_records(){
+
+			$('#records_tbl').append('<p align="center"><b>{% trans "RECORDED MAILS & INVOICES" %}</b></p>' +
+
+									'<div style="clear:both; height:10px;"></div>' +
+
+									'<table id="tbl" class="table table-striped table-bordered table-condensed">');
+									
+									$('#tbl').append('<thead>' +
+										'<th>{% trans "Sender" %}</th><th>{% trans "Mail Type" %}</th><th>{% trans "Record date" %}</th>' +
+									'</thead>' +
+										
+									'<tbody>' +
+										
+									'</tbody>');
+
+
+									var records = JSON.parse("{{mails}}".replace(/&quot;/g,'"'));
+
+									records = { json: records };
+			
+									var i;
+									var sender;
+									var mail_type;
+									var record_date;
+
+									for (i = 0; i < records.json.length; i++){
+
+									sender = records.json[i]["sender_f_name"];
+									mail_type = records.json[i]["mail_type_name"];
+									record_date = records.json[i]["received_time"];
+									record_date = record_date.substring(0,10);
+									$('#tbl').find('tbody').append('<tr style="cursor:pointer;"></tr>');
+
+										$('#tbl tr:last').append('<td align="center">' + sender +'</td>');
+										$('#tbl tr:last').append('<td align="center">'+ mail_type +'</a></td>');
+										$('#tbl tr:last').append('<td align="center">'+ record_date +'</a></td>');
+									}
+
+									
+									$('#tbl').DataTable({
+										dom: "<'row'<'col-sm-3'l><'col-sm-4'i><'col-sm-5'f>>" +
+											"<'row'<'col-sm-12'tr>>" +
+											"<'row'<'col-sm-4'B><'col-sm-8'p>>",
+										pagingType: "full_numbers",
+										lengthMenu: [
+								            [10, 25, 50, 100, -1 ],
+								            ['10', '25', '50', '100', 'All' ]
+								        ],
+								        buttons: [
+								            'copy', 'csv', 'excel', 'pdf', 'print'
+								        ]
+									});
+
+		}
 
 		function saveMail() {
 
@@ -35,14 +95,14 @@
 				return;
 			}
 
-			console.log(mail_type);
-			console.log(sender);
-
 			ajaxurl = 'save_mail';
 			data = JSON.stringify({ 'mail_type': mail_type, 'sender': sender});
 
 			ajaxpost(ajaxurl, data);
 
+			$("#records_tbl").html("");
+
+			desplay_records();
 		}
 
 
@@ -89,7 +149,7 @@
 		{% endif %}
 	</div>
 	
-	<div>
+	<div align="center">
 		<div class="form-inline" style="padding-left :5px; padding-right :5px;">
 
 			<form method="post" enctype="multipart/form-data">
@@ -112,6 +172,13 @@
 			<button type="submit" onclick="saveMail()">Save</button>
 
 			</form>
+
+		</div>
+
+		<br/>
+		<br/>
+
+		<div id="records_tbl">
 
 		</div>
 

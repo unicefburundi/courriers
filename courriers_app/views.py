@@ -6,6 +6,7 @@ from courriers_app.models import *
 from forms import *
 from django.http import HttpResponse
 import json
+from django.db.models import F
 
 
 # Create your views here.
@@ -13,26 +14,30 @@ def landing(request):
     d = {}
     return render(request, 'landing_page.html', d)
 
+def date_handler(obj):
+    if hasattr(obj, 'isoformat'):
+        return obj.isoformat()
+    else:
+        raise TypeError
 
 def home(request):
     d = {}
     return render(request, 'home.html', d)
 
 def new_mail(request):
-    print "AAA"
     '''if request.method == 'POST' and request.FILES['my_file']:'''
     if request.method == 'POST':
         mail_type = request.POST.get('mail_type')
         sender = request.POST.get('sender')
-        print ">>>"
-        print mail_type
-        print sender
 
     d = {}
     d["pagetitle"] = "New mails"
     d["mail_types"] = MailType.objects.all()
     d["senders"] = Sender.objects.all()
-
+    d["mails"] = Mail.objects.all()
+    d["mails"] = Mail.objects.all().annotate(sender_f_name = F('sender__first_name')).annotate(sender_l_name = F('sender__last_name')).annotate(mail_type_name = F('mail_type__mail_type_name'))
+    d["mails"] = d["mails"].values()
+    d["mails"] = json.dumps(list(d["mails"]), default=date_handler)
     return render(request, 'new_mail.html', d)
 
 

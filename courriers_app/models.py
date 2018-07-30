@@ -52,6 +52,7 @@ class MailType(models.Model):
 
 class Mail(models.Model):
     '''In this model, we will store mails and invoices'''
+    number = models.CharField(max_length=20, unique=True)
     sender = models.ForeignKey(Sender)
     mail = models.ImageField(null=True)
     mail_type = models.ForeignKey(MailType)

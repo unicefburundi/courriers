@@ -35,7 +35,7 @@
 									'<table id="tbl" class="table table-striped table-bordered table-condensed">');
 									
 									$('#tbl').append('<thead>' +
-										'<th>{% trans "Sender" %}</th><th>{% trans "Mail Type" %}</th><th>{% trans "Record date" %}</th>' +
+										'<th>{% trans "Id" %}</th><th>{% trans "Sender" %}</th><th>{% trans "Mail Type" %}</th><th>{% trans "Record date" %}</th>' +
 									'</thead>' +
 										
 									'<tbody>' +
@@ -51,15 +51,17 @@
 									var sender;
 									var mail_type;
 									var record_date;
-
+									console.log(records);
 									for (i = 0; i < records.json.length; i++){
 
+									number = records.json[i]["number"];
 									sender = records.json[i]["sender_f_name"];
 									mail_type = records.json[i]["mail_type_name"];
 									record_date = records.json[i]["received_time"];
 									record_date = record_date.substring(0,10);
 									$('#tbl').find('tbody').append('<tr style="cursor:pointer;"></tr>');
 
+										$('#tbl tr:last').append('<td align="center">' + number +'</td>');
 										$('#tbl tr:last').append('<td align="center">' + sender +'</td>');
 										$('#tbl tr:last').append('<td align="center">'+ mail_type +'</a></td>');
 										$('#tbl tr:last').append('<td align="center">'+ record_date +'</a></td>');
@@ -94,9 +96,14 @@
 			}else{
 				return;
 			}
+			if ($('#mail_number').val() != ""){
+				mail_number = $('#mail_number').val();
+			}else{
+				return;
+			}
 
 			ajaxurl = 'save_mail';
-			data = JSON.stringify({ 'mail_type': mail_type, 'sender': sender});
+			data = JSON.stringify({ 'mail_type': mail_type, 'sender': sender, 'mail_number': mail_number});
 
 			ajaxpost(ajaxurl, data);
 
@@ -167,6 +174,11 @@
 				<select id="sender" class="form-control" style="width:140px"  required="required">
 					<option value="" selected="selected">[ {% trans "Select the sender" %} ]</option>'
 				</select>
+			</div>
+
+			<div class="form-group">
+				<label for="mail_number">{% trans "Number:" %}</label>
+				<input type="text" class="form-control" style="width:140px" id="mail_number" required="required">
 			</div>
 
 			<button type="submit" onclick="saveMail()">Save</button>

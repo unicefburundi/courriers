@@ -49,18 +49,21 @@ def save_mail(request):
         json_data = json.loads(request.body)
         mail_type = json_data['mail_type']
         sender = json_data['sender']
+        mail_number = json_data['mail_number']
         
         mail_type_object = MailType.objects.filter(id=mail_type)
         sender_object = Sender.objects.filter(id=sender)
 
         if len(mail_type_object) > 0:
             mail_type_object = mail_type_object[0]
-            print mail_type_object
         if len(sender_object) > 0:
             sender_object = sender_object[0]
-            print sender_object
 
-        Mail.objects.create(sender = sender_object, mail_type = mail_type_object)
+        existing_mail = Mail.objects.filter(number = mail_number)
+        if len(existing_mail) > 0:
+            print "Error. A record with that number already exists."
+        else:
+            Mail.objects.create(number = mail_number, sender = sender_object, mail_type = mail_type_object)
 
         return HttpResponse(response_data, content_type="application/json")
 

@@ -7,6 +7,7 @@ from forms import *
 from django.http import HttpResponse
 import json
 from django.db.models import F
+import datetime
 
 
 # Create your views here.
@@ -25,7 +26,6 @@ def home(request):
     return render(request, 'home.html', d)
 
 def new_mail(request):
-    '''if request.method == 'POST' and request.FILES['my_file']:'''
     if request.method == 'POST':
         mail_type = request.POST.get('mail_type')
         sender = request.POST.get('sender')
@@ -39,6 +39,13 @@ def new_mail(request):
     d["mails"] = d["mails"].values()
     d["mails"] = json.dumps(list(d["mails"]), default=date_handler)
     return render(request, 'new_mail.html', d)
+
+def close_mail_view(request):
+    d = {}
+    d["senders"] = Sender.objects.all()
+    d["unclosed_mails"] = Mail.objects.filter(closed = False)
+    d["closed_mails"] = Mail.objects.filter(closed = True)
+    return render(request, 'close.html', d)
 
 
 def save_mail(request):
@@ -87,22 +94,36 @@ def save_transfer(request):
         if len(staff_record) > 0:
             staff_record = staff_record[0]
 
-        
-        track.objects.create(mail = mail_record, staff = staff_record, purpose = comments)
+
+        Track.objects.create(mail = mail_record, staff = staff_record, purpose = comments)
 
         return HttpResponse(response_data, content_type="application/json")
 
+
+def close_mail(request):
+    response_data = {}
+    if request.method == 'POST':
+        json_data = json.loads(request.body)
+        sender = int(json_data['sender'])
+        mail = json_data['mail']
+        the_mail = Mail.objects.filter(number = mail)
+        if len(the_mail) > 0:
+            the_mail = the_mail[0]
+            the_mail.closed = True
+            the_mail.closed_time = datetime.datetime.now()
+            the_mail.save()
+    return HttpResponse(response_data, content_type="application/json")
 
 def transfer_mail(request):
     d = {}
     d["senders"] = Sender.objects.all()
     d["staff"] = Staff.objects.all().annotate(section_name = F('section__designation'))
-    d["transfers"] = track.objects.all().annotate(sender_f_name = F('mail__sender__first_name')).annotate(sender_l_name = F('mail__sender__last_name')).annotate(mail_number = F('mail__number')).annotate(staff_f_name = F('staff__first_name')).annotate(staff_l_name = F('staff__last_name')).annotate(section = F('staff__section__designation'))
+    d["transfers"] = Track.objects.all().annotate(sender_f_name = F('mail__sender__first_name')).annotate(sender_l_name = F('mail__sender__last_name')).annotate(mail_number = F('mail__number')).annotate(staff_f_name = F('staff__first_name')).annotate(staff_l_name = F('staff__last_name')).annotate(section = F('staff__section__designation'))
     d["transfers"] = d["transfers"].values()
     d["transfers"] = json.dumps(list(d["transfers"]), default=date_handler)
     return render(request, 'transfer.html', d)
 
-def get_mails(request):
+def get_unclosed_mails(request):
     response_data = {}
     if request.method == 'POST':
         json_data = json.loads(request.body)
@@ -110,16 +131,32 @@ def get_mails(request):
         sender = Sender.objects.filter(id=sender_id)
         if len(sender) > 0:
             sender = sender[0]
-            mails = Mail.objects.filter(sender = sender)
+            mails = Mail.objects.filter(sender = sender, closed = False)
             '''response_data["mails"] = mails'''
             mails = mails.values()
             mails = json.dumps(list(mails), default=date_handler)
             mails = json.loads(mails)
             mails = json.dumps(mails, default=date_handler)
 
-            print mails
-    '''return HttpResponse(response_data)
-    '''     
-    print(mails)
+
+    return HttpResponse(mails, content_type="application/json")
+
+
+def get_closed_mails(request):
+    response_data = {}
+    if request.method == 'POST':
+        json_data = json.loads(request.body)
+        sender_id = json_data['code']
+        sender = Sender.objects.filter(id=sender_id)
+        if len(sender) > 0:
+            sender = sender[0]
+            mails = Mail.objects.filter(sender = sender, closed = True)
+            '''response_data["mails"] = mails'''
+            mails = mails.values()
+            mails = json.dumps(list(mails), default=date_handler)
+            mails = json.loads(mails)
+            mails = json.dumps(mails, default=date_handler)
+
+
     return HttpResponse(mails, content_type="application/json")
 

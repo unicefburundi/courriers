@@ -57,11 +57,13 @@ class Mail(models.Model):
     mail = models.ImageField(null=True)
     mail_type = models.ForeignKey(MailType)
     received_time = models.DateTimeField(auto_now_add=True, blank=True)
+    closed = models.BooleanField(default=False)
+    closed_time = models.DateTimeField(null=True)
 
     def __unicode__(self):
         return "{0} - Mail type : {1} - Registered {2}".format(self.sender.first_name, self.mail_type.mail_type_name, self.received_time)
 
-class track(models.Model):
+class Track(models.Model):
     '''In this model, we will record wherever a mail went through'''
     mail = models.ForeignKey(Mail)
     staff = models.ForeignKey(Staff)

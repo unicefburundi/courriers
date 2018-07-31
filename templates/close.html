@@ -1,0 +1,153 @@
+{% extends "base2.html" %}
+{% load staticfiles %}
+{% load i18n %}
+{% load static %}
+
+{% block head %}
+	<script language="JavaScript">
+		$(document).ready(function() {
+
+			if ("{{ senders }}") {
+				{% for s in senders %}
+					$('#sender').append('<option value="{{ s.id }}">{{ s.first_name }} {{s.last_name}}</option>');
+				{% endfor %}
+			}
+
+		});
+
+
+		function closeMail(){
+
+			if ($('#sender').val() != ""){
+				sender = $('#sender').val();
+			}else{
+				return;
+			}
+			if ($('#mail').val() != ""){
+				mail = $('#mail').val();
+			}else{
+				return;
+			}
+
+			ajaxurl = 'close_mail';
+			data = JSON.stringify({ 'sender': sender, 'mail': mail});
+
+
+			$("#records_tbl").html("");
+
+			ajaxpost(ajaxurl, data);
+
+		}
+
+		function fetchmails(code) {
+			$("#mail option").each(function(){
+        		if ($(this).val()) {
+        			$(this).remove();
+        		}
+		    });
+
+		    $('#records_tbl').empty();
+			if (code) {
+				//initializesonic();
+
+				ajaxurl = 'get_unclosed_mails';
+				ajaxpostbackfunction = "fetch_mails";
+	            data = JSON.stringify({ 'code': code });
+
+	            ajaxpost(ajaxurl, data);
+	        }
+
+		}
+
+				function ajaxpost(posturl, data) {
+		        ajaxresults = null;
+		        $.ajax({
+		        	beforeSend: function(xhr, settings) {
+				        if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+				            xhr.setRequestHeader("X-CSRFToken", csrftoken);
+				        }
+				    },
+		            type: 'POST',
+		            url: posturl,
+		            data: data,
+		            //contentType: 'application/json; charset=utf-8',
+		            //dataType: 'json',
+
+		            success: function (response) {
+		            	if (ajaxpostbackfunction == "fetch_mails") {
+		            		console.log(response.length);
+		                	for (i = 0; i < response.length; i++) {
+
+		                		var id = response[i]["number"];
+
+		                		$('#mail').append('<option value=' + id +'>' + id + '</option>');
+
+    						}
+    						// fetch wanted data
+		                }
+		            },
+		            failure: function (json) {
+		                console.log("Fail");
+		            },
+		            error: function (jqXHR, exception) {
+		                console.log("Error");
+		                console.log(exception);
+		            }
+		        })
+		}
+
+	</script>
+{% endblock %}
+
+
+{% block container %}
+
+
+	<div>
+		{% if msg %}
+			<div class="divmessage"><p>{{ msg }}</p></div>
+		{% endif %}
+		{% if err %}
+			<div class="diverror"><p>{{ err }}</p></div>
+		{% endif %}
+	</div>
+	
+	<div align="center">
+		<div class="form-inline" style="padding-left :5px; padding-right :5px;">
+
+			<form method="post" enctype="multipart/form-data">
+			{% csrf_token %}
+
+
+			<div class="form-group">
+				<label for="sender">{% trans "Sender:" %}</label>
+				<select id="sender" class="form-control" style="width:140px"  onchange="fetchmails(this.value)" required="required">
+					<option value="" selected="selected">[ {% trans "Select the sender" %} ]</option>'
+				</select>
+			</div>
+
+			<div class="form-group">
+				<label for="mail">{% trans "Mail/Invoice:" %}</label>
+				<select id="mail" class="form-control" style="width:140px"  required="required">
+					<option value="" selected="selected">[ {% trans "Select the sender" %} ]</option>'
+				</select>
+			</div>
+
+
+			<button type="submit" onclick="closeMail()">Close</button>
+
+			</form>
+
+		</div>
+
+		<br/>
+		<br/>
+
+		<div id="records_tbl">
+
+		</div>
+
+	</div>
+
+
+{% endblock %}

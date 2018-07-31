@@ -42,7 +42,6 @@ def new_mail(request):
 
 
 def save_mail(request):
-    print "BBB"
     response_data = {}
     if request.method == 'POST':
         #import pdb; pdb.set_trace()
@@ -67,7 +66,56 @@ def save_mail(request):
 
         return HttpResponse(response_data, content_type="application/json")
 
+def save_transfer(request):
+    response_data = {}
+    if request.method == 'POST':
+        #import pdb; pdb.set_trace()
+        json_data = json.loads(request.body)
+        sender = int(json_data['sender'])
+        mail = json_data['mail']
+        staff = json_data['staff']
+        comments = json_data['comments']
 
-def track_mail(request):
+        sender_record = Sender.objects.filter(id=sender)
+        mail_record = Mail.objects.filter(number=mail)
+        staff_record = Staff.objects.filter(id=staff)
+
+        if len(sender_record) > 0:
+            sender_record = sender_record[0]
+        if len(mail_record) > 0:
+            mail_record = mail_record[0]
+        if len(staff_record) > 0:
+            staff_record = staff_record[0]
+
+        track.objects.create(mail = mail_record, staff = staff_record, purpose = comments)
+
+        return HttpResponse(response_data, content_type="application/json")
+
+
+def transfer_mail(request):
     d = {}
-    return render(request, 'track_mail.html', d)
+    d["senders"] = Sender.objects.all()
+    d["staff"] = Staff.objects.all().annotate(section_name = F('section__designation'))
+    return render(request, 'transfer.html', d)
+
+def get_mails(request):
+    response_data = {}
+    if request.method == 'POST':
+        json_data = json.loads(request.body)
+        sender_id = json_data['code']
+        sender = Sender.objects.filter(id=sender_id)
+        if len(sender) > 0:
+            sender = sender[0]
+            mails = Mail.objects.filter(sender = sender)
+            '''response_data["mails"] = mails'''
+            mails = mails.values()
+            mails = json.dumps(list(mails), default=date_handler)
+            mails = json.loads(mails)
+            mails = json.dumps(mails, default=date_handler)
+
+            print mails
+    '''return HttpResponse(response_data)
+    '''     
+    print(mails)
+    return HttpResponse(mails, content_type="application/json")
+

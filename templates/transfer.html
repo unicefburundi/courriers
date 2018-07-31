@@ -23,8 +23,76 @@
 				{% endfor %}
 			}
 
+			desplay_records();
 
 		});
+
+		function desplay_records(){
+
+			$('#records_tbl').append('<p align="center"><b>{% trans "RECORDED MAILS & INVOICES" %}</b></p>' +
+
+									'<div style="clear:both; height:10px;"></div>' +
+
+									'<table id="tbl" class="table table-striped table-bordered table-condensed">');
+									
+									$('#tbl').append('<thead>' +
+										'<th>{% trans "Sender First Name" %}</th><th>{% trans "Mail/Invoice" %}</th><th>{% trans "Transfer Date" %}</th><th>{% trans "Staff" %}</th><th>{% trans "Section" %}</th><th>{% trans "Action Required" %}</th><th>{% trans "End Date" %}</th>' +
+									'</thead>' +
+										
+									'<tbody>' +
+										
+									'</tbody>');
+
+									var records = JSON.parse("{{transfers}}".replace(/&quot;/g,'"'));
+
+									records = { json: records };
+
+									var i;
+									var sender;
+									var mail_number;
+									var transfer_date;
+									var staff;
+									var section;
+									var action;
+									var end_date;
+
+									for (i = 0; i < records.json.length; i++){
+										sender = records.json[i]["sender_f_name"];
+										mail_number = records.json[i]["mail_number"];
+										transfer_date = records.json[i]["start_date"];
+										transfer_date = transfer_date.substring(0,19);
+										staff = records.json[i]["staff_f_name"];
+										section = records.json[i]["section"];
+										action = records.json[i]["purpose"];
+										end_date = records.json[i]["end_date"];
+
+										$('#tbl').find('tbody').append('<tr style="cursor:pointer;"></tr>');
+
+										$('#tbl tr:last').append('<td align="center">' + sender +'</td>');
+										$('#tbl tr:last').append('<td align="center">' + mail_number +'</td>');
+										$('#tbl tr:last').append('<td align="center">' + transfer_date +'</td>');
+										$('#tbl tr:last').append('<td align="center">' + staff +'</td>');
+										$('#tbl tr:last').append('<td align="center">' + section +'</td>');
+										$('#tbl tr:last').append('<td align="center">' + action +'</td>');
+										$('#tbl tr:last').append('<td align="center">' + end_date +'</td>');
+									}
+
+									$('#tbl').DataTable({
+										dom: "<'row'<'col-sm-3'l><'col-sm-4'i><'col-sm-5'f>>" +
+											"<'row'<'col-sm-12'tr>>" +
+											"<'row'<'col-sm-4'B><'col-sm-8'p>>",
+										pagingType: "full_numbers",
+										lengthMenu: [
+								            [10, 25, 50, 100, -1 ],
+								            ['10', '25', '50', '100', 'All' ]
+								        ],
+								        buttons: [
+								            'copy', 'csv', 'excel', 'pdf', 'print'
+								        ]
+									});
+
+
+		}
 
 		function transferMail(){
 
@@ -51,12 +119,13 @@
 
 			ajaxurl = 'save_transfer';
 			data = JSON.stringify({ 'sender': sender, 'mail': mail, 'staff': staff, 'comments': comments});
-			//data = JSON.stringify({ 'sender': sender, 'mail': mail, 'staff': staff});
 
+
+			$("#records_tbl").html("");
 
 			ajaxpost(ajaxurl, data);
 
-
+			desplay_records();
 
 		}
 
@@ -77,6 +146,8 @@
 
 	            ajaxpost(ajaxurl, data);
 	        }
+
+	        desplay_records();
 		}
 
 		function desplay_history(code){
@@ -179,7 +250,7 @@
 		<br/>
 
 		<div id="records_tbl">
-		
+
 		</div>
 
 	</div>

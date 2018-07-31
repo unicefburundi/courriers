@@ -87,6 +87,7 @@ def save_transfer(request):
         if len(staff_record) > 0:
             staff_record = staff_record[0]
 
+        
         track.objects.create(mail = mail_record, staff = staff_record, purpose = comments)
 
         return HttpResponse(response_data, content_type="application/json")
@@ -96,6 +97,9 @@ def transfer_mail(request):
     d = {}
     d["senders"] = Sender.objects.all()
     d["staff"] = Staff.objects.all().annotate(section_name = F('section__designation'))
+    d["transfers"] = track.objects.all().annotate(sender_f_name = F('mail__sender__first_name')).annotate(sender_l_name = F('mail__sender__last_name')).annotate(mail_number = F('mail__number')).annotate(staff_f_name = F('staff__first_name')).annotate(staff_l_name = F('staff__last_name')).annotate(section = F('staff__section__designation'))
+    d["transfers"] = d["transfers"].values()
+    d["transfers"] = json.dumps(list(d["transfers"]), default=date_handler)
     return render(request, 'transfer.html', d)
 
 def get_mails(request):

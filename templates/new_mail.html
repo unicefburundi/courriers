@@ -58,7 +58,7 @@
 									sender = records.json[i]["sender_f_name"];
 									mail_type = records.json[i]["mail_type_name"];
 									record_date = records.json[i]["received_time"];
-									record_date = record_date.substring(0,10);
+									record_date = record_date.substring(0,19);
 									$('#tbl').find('tbody').append('<tr style="cursor:pointer;"></tr>');
 
 										$('#tbl tr:last').append('<td align="center">' + number +'</td>');
@@ -191,7 +191,7 @@
 		<br/>
 
 		<div id="records_tbl">
-		
+
 		</div>
 
 	</div>

@@ -12,4 +12,7 @@ urlpatterns = [
     url(r'^save_transfer$', views.save_transfer, name='save_transfer'),
     url(r'^close_mail_view$', views.close_mail_view, name='close_mail_view'),
     url(r'^close_mail$', views.close_mail, name='close_mail'),
+    url(r'^stat_all_mails$', views.stat_all_mails, name='stat_all_mails'),
+    url(r'^stat_closed_mails$', views.stat_closed_mails, name='stat_closed_mails'),
+    url(r'^stat_not_closed_mails$', views.stat_not_closed_mails, name='stat_not_closed_mails'),
 ]

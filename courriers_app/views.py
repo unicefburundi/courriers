@@ -6,8 +6,9 @@ from courriers_app.models import *
 from forms import *
 from django.http import HttpResponse
 import json
-from django.db.models import F
+from django.db.models import F, Count
 import datetime
+from django.core import serializers
 
 
 # Create your views here.
@@ -46,6 +47,29 @@ def close_mail_view(request):
     d["unclosed_mails"] = Mail.objects.filter(closed = False)
     d["closed_mails"] = Mail.objects.filter(closed = True)
     return render(request, 'close.html', d)
+
+
+def stat_all_mails(request):
+    d = {}
+    all_pie_data = Mail.objects.all().values("closed").annotate(number=Count('closed'))
+    d["number_of_all_mails"] = Mail.objects.all().count()
+    d["all_pie_data"] = all_pie_data
+
+    return render(request, 'stat_all_mails.html', d)
+
+def stat_closed_mails(request):
+    d = {}
+    d["senders"] = Sender.objects.all()
+    d["unclosed_mails"] = Mail.objects.filter(closed = False)
+    d["closed_mails"] = Mail.objects.filter(closed = True)
+    return render(request, 'stat_closed_mails.html', d)
+
+def stat_not_closed_mails(request):
+    d = {}
+    d["senders"] = Sender.objects.all()
+    d["unclosed_mails"] = Mail.objects.filter(closed = False)
+    d["closed_mails"] = Mail.objects.filter(closed = True)
+    return render(request, 'stat_not_closed_mails.html', d)
 
 
 def save_mail(request):

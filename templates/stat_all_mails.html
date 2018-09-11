@@ -1,0 +1,106 @@
+{% extends "base2.html" %}
+{% load staticfiles %}
+{% load i18n %}
+{% load static %}
+
+
+{% block head %}
+
+	<script language="JavaScript">
+
+
+		$(document).ready(function() {
+			displayPieChart1();
+		});
+
+		function displayPieChart1(){
+			
+			$('#pie_chart_for_all').empty();
+
+			var all_pie_data_list = [];
+
+	        {% for one_data_type in all_pie_data %}
+	        	var one_item = {};
+	        	var name = "{{ one_data_type.closed }}";
+	        	var y = "{{ one_data_type.number }}";
+
+	        	if(name === "True"){
+	        		one_item["name"] = "Completed";
+
+	        	}
+	        	if(name === "False"){
+	        		one_item["name"] = "In progress";
+	        	}
+
+	        	one_item["y"] = parseInt(y);
+	        	all_pie_data_list.push(one_item);
+	        {% endfor %}
+
+	        var number_of_all_mails = "{{ number_of_all_mails }}";
+	        var chart_title = "<b> Completed and In progress Mails </b> - <i> Total : </i>"+number_of_all_mails
+
+	        Highcharts.chart('pie_chart_for_all', {
+							        chart: {
+							            plotBackgroundColor: null,
+							            plotBorderWidth: null,
+							            plotShadow: false,
+							            type: 'pie'
+							        },
+							        title: {
+							            text: chart_title
+							        },
+							        tooltip: {
+							            pointFormat: 'Number : <b>{point.y}</b> <br> {series.name}: <b>{point.percentage:.1f}%</b>'
+							        },
+							        plotOptions: {
+							            pie: {
+							                allowPointSelect: true,
+							                cursor: 'pointer',
+							                dataLabels: {
+							                    enabled: true,
+                								format: 'Number : <b>{point.y}</b> <br> {series.name}: <b>{point.percentage:.1f}%</b>',
+                								style: {
+                    									color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
+                										}
+
+							                },
+							                showInLegend: true
+							            }
+							        },
+							        series: [{
+							            name: 'Percentages ',
+							            colorByPoint: true,
+							            data: all_pie_data_list
+							        }],
+							        credits: {
+									      enabled: false
+									  },
+							    });
+
+		}
+
+	</script>
+
+
+
+{% endblock %}
+
+
+{% block container %}
+<div class="well col-sm-12">
+
+	<div class="col-sm-3">
+		
+	</div>
+
+	<div id="pie_chart_for_all" class="well col-sm-6">
+		
+	</div>
+
+	<div class="col-sm-3">
+		
+	</div>
+	
+</div>
+
+{% endblock %}

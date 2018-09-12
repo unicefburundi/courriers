@@ -6,10 +6,18 @@ from courriers_app.models import *
 from forms import *
 from django.http import HttpResponse
 import json
-from django.db.models import F, Count
+from django.db.models import F, Count, Func
 import datetime
 from django.core import serializers
 
+
+class DiffDays(Func):
+    function = 'DATE_PART'
+    template = "%(function)s('day', %(expressions)s)"
+
+class CastDate(Func):
+    function = 'date_trunc'
+    template = "%(function)s('day', %(expressions)s)"
 
 # Create your views here.
 def landing(request):
@@ -59,9 +67,9 @@ def stat_all_mails(request):
 
 def stat_closed_mails(request):
     d = {}
-    d["senders"] = Sender.objects.all()
-    d["unclosed_mails"] = Mail.objects.filter(closed = False)
-    d["closed_mails"] = Mail.objects.filter(closed = True)
+    closed_pie_data = Mail.objects.filter(closed = "True").annotate(processing_time=DiffDays(CastDate(F('closed_time'))-CastDate(F('received_time'))) + 1).values('processing_time').annotate(number_same_time=Count('processing_time'))
+    d["number_of_completed_mails"] = Mail.objects.filter(closed = "True").count()
+    d["closed_pie_data"] = closed_pie_data
     return render(request, 'stat_closed_mails.html', d)
 
 def stat_not_closed_mails(request):

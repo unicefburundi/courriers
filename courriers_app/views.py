@@ -74,9 +74,12 @@ def stat_closed_mails(request):
 
 def stat_not_closed_mails(request):
     d = {}
-    d["senders"] = Sender.objects.all()
-    d["unclosed_mails"] = Mail.objects.filter(closed = False)
-    d["closed_mails"] = Mail.objects.filter(closed = True)
+    current_date = datetime.datetime.now().date()
+
+    not_closed_pie_data = Mail.objects.filter(closed = "False").annotate(processing_time=DiffDays(CastDate(current_date)-CastDate(F('received_time'))) + 1).values('processing_time').annotate(number_same_time=Count('processing_time'))
+    d["number_of_not_completed_mails"] = Mail.objects.filter(closed = "False").count()
+    d["not_closed_pie_data"] = not_closed_pie_data
+    
     return render(request, 'stat_not_closed_mails.html', d)
 
 

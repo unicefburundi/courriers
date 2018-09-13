@@ -139,7 +139,16 @@ def save_transfer(request):
             staff_record = staff_record[0]
 
 
-        
+        # Let's first record that the staff who is transfering this mail finished his work
+        mail_related_track_records = Track.objects.filter(mail = mail_record)
+        last = mail_related_track_records[len(mail_related_track_records) - 1] if mail_related_track_records else None
+        if last is not None:
+            last.end_date = datetime.datetime.now()
+            last.save()
+        else:
+            pass
+
+
         Track.objects.create(mail = mail_record, staff = staff_record, purpose = comments)
 
         return HttpResponse(response_data, content_type="application/json")

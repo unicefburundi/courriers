@@ -11,6 +11,7 @@
 
 		$(document).ready(function() {
 			displayPieChart1();
+			desplay_records();
 		});
 
 		function displayPieChart1(){
@@ -79,6 +80,84 @@
 
 		}
 
+
+		function displayMailDetails(key=0){
+			mail_number = key.closest('tr').getElementsByTagName('td')[0].innerHTML;
+
+			
+			window.open('mail_details/?mail_number='+mail_number,'','fullscreen=yes');
+		}
+
+
+
+		function desplay_records(){
+
+			$('#records_tbl').append('<p align="center"><b>{% trans "RECORDED MAILS" %}</b></p>' +
+
+									'<div style="clear:both; height:10px;"></div>' +
+
+									'<table id="tbl" class="table table-striped table-bordered table-condensed">');
+									
+									$('#tbl').append('<thead>' +
+										'<th align="center">{% trans "Id" %}</th><th>{% trans "Sender" %}</th><th>{% trans "Mail Type" %}</th><th>{% trans "Record date" %}</th><th>{% trans "Close date" %}</th>' +
+									'</thead>' +
+										
+									'<tbody>' +
+										
+									'</tbody>');
+
+
+									var records = JSON.parse("{{mails}}".replace(/&quot;/g,'"'));
+
+									records = { json: records };
+			
+									var i;
+									var sender;
+									var mail_type;
+									var record_date;
+									
+									for (i = 0; i < records.json.length; i++){
+
+									number = records.json[i]["number"];
+									sender = records.json[i]["sender_f_name"];
+									mail_type = records.json[i]["mail_type_name"];
+									record_date = records.json[i]["received_time"];
+									close_date = records.json[i]["closed_time"];
+									record_date = record_date.substring(0,19);
+									if (close_date){
+										close_date = close_date.substring(0,19);
+									}else{
+										close_date = "-"
+									}
+									$('#tbl').find('tbody').append('<tr style="cursor:pointer;"></tr>');
+
+
+										$('#tbl tr:last').append('<td align="center"><a href="#" onclick = "displayMailDetails(this)">'+ number +'</a></td>');
+
+
+										$('#tbl tr:last').append('<td align="center">' + sender +'</td>');
+										$('#tbl tr:last').append('<td align="center">'+ mail_type +'</a></td>');
+										$('#tbl tr:last').append('<td align="center">'+ record_date +'</a></td>');
+										$('#tbl tr:last').append('<td align="center">'+ close_date +'</a></td>');
+									}
+
+									
+									$('#tbl').DataTable({
+										dom: "<'row'<'col-sm-3'l><'col-sm-4'i><'col-sm-5'f>>" +
+											"<'row'<'col-sm-12'tr>>" +
+											"<'row'<'col-sm-4'B><'col-sm-8'p>>",
+										pagingType: "full_numbers",
+										lengthMenu: [
+								            [10, 25, 50, 100, -1 ],
+								            ['10', '25', '50', '100', 'All' ]
+								        ],
+								        buttons: [
+								            'copy', 'csv', 'excel', 'pdf', 'print'
+								        ]
+									});
+
+		}
+
 	</script>
 
 
@@ -87,20 +166,46 @@
 
 
 {% block container %}
-<div class="well col-sm-12">
 
-	<div class="col-sm-3">
-		
+<ul class="nav nav-tabs">
+	    <li class="active"><a data-toggle="tab" href="#status">Status</a></li>
+	    <li><a data-toggle="tab" href="#mails">Mails</a></li>
+</ul>
+
+<div class="well col-sm-12 tab-content">
+
+	<div id="status" class="tab-pane fade in active">
+		<div class="col-sm-1">
+			
+		</div>
+
+		<div id="pie_chart_for_all" class="well col-sm-10">
+			
+		</div>
+
+		<div class="col-sm-1">
+			
+		</div>
 	</div>
 
-	<div id="pie_chart_for_all" class="well col-sm-6">
-		
+
+	<div id="mails" class="tab-pane fade">
+		<div class="col-sm-1">
+			
+		</div>
+
+		<div id="pie_chart_2" class="well col-sm-10">
+			<div id="records_tbl">
+
+			</div>
+		</div>
+
+		<div class="col-sm-1">
+			
+		</div>
 	</div>
 
-	<div class="col-sm-3">
-		
-	</div>
-	
 </div>
+
 
 {% endblock %}

@@ -56,12 +56,23 @@ def close_mail_view(request):
     d["closed_mails"] = Mail.objects.filter(closed = True)
     return render(request, 'close.html', d)
 
+def mail_details(request, mail_number):
+    rows = ""
+    return render(request, 'mail_details.html', {'rows':rows})
+
 
 def stat_all_mails(request):
     d = {}
     all_pie_data = Mail.objects.all().values("closed").annotate(number=Count('closed'))
     d["number_of_all_mails"] = Mail.objects.all().count()
     d["all_pie_data"] = all_pie_data
+
+    d["mails"] = Mail.objects.all().annotate(sender_f_name = F('sender__first_name')).annotate(sender_l_name = F('sender__last_name')).annotate(mail_type_name = F('mail_type__mail_type_name'))
+    d["mails"] = d["mails"].values()
+    d["mails"] = json.dumps(list(d["mails"]), default=date_handler)
+
+    print ">>> ..."
+    print d["mails"]
 
     return render(request, 'stat_all_mails.html', d)
 

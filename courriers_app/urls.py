@@ -15,4 +15,5 @@ urlpatterns = [
     url(r'^stat_all_mails$', views.stat_all_mails, name='stat_all_mails'),
     url(r'^stat_closed_mails$', views.stat_closed_mails, name='stat_closed_mails'),
     url(r'^stat_not_closed_mails$', views.stat_not_closed_mails, name='stat_not_closed_mails'),
+    url(r'^mail_details/(?P<mail_number>)$', views.mail_details, name='mail_details'),
 ]

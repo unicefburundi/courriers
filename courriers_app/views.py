@@ -82,9 +82,13 @@ def stat_not_closed_mails(request):
 
     not_closed_pie_data_2 = Track.objects.select_related().filter(end_date__isnull=True, mail__closed = "False").annotate(received_date=F('mail__received_time')).annotate(staff_f_name=F('staff__first_name')).annotate(staff_l_name=F('staff__last_name')).annotate(staff_section=F('staff__section__designation')).values('staff_section').annotate(number_of_mails_in_section=Count('staff_section'))
     d["not_closed_pie_data_2"] = not_closed_pie_data_2
-    
-    
 
+    not_closed_pie_data_3 = Track.objects.select_related().filter(end_date__isnull=True, mail__closed = "False").annotate(received_date=F('mail__received_time')).annotate(staff_f_name=F('staff__first_name')).annotate(staff_l_name=F('staff__last_name')).annotate(staff_section=F('staff__section__designation')).values('staff__first_name', 'staff__last_name').annotate(number_of_mails_for_one_staff=Count('staff__first_name'))
+    d["not_closed_pie_data_3"] = not_closed_pie_data_3
+
+    print ">>> ..."
+    print not_closed_pie_data_3
+    
     return render(request, 'stat_not_closed_mails.html', d)
 
 
@@ -135,6 +139,7 @@ def save_transfer(request):
             staff_record = staff_record[0]
 
 
+        
         Track.objects.create(mail = mail_record, staff = staff_record, purpose = comments)
 
         return HttpResponse(response_data, content_type="application/json")

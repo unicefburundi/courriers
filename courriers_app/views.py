@@ -6,7 +6,7 @@ from courriers_app.models import *
 from forms import *
 from django.http import HttpResponse
 import json
-from django.db.models import F, Count, Func
+from django.db.models import F, Count, Func, Sum
 import datetime
 from django.core import serializers
 
@@ -57,8 +57,18 @@ def close_mail_view(request):
     return render(request, 'close.html', d)
 
 def mail_details(request, mail_number):
-    rows = ""
-    return render(request, 'mail_details.html', {'rows':rows})
+    d = {}
+    mail_number = str(request.GET.get('mail_number', '')).strip()
+
+    one_mail_follow_up_data = Track.objects.filter(mail__number = mail_number).values("staff__section__designation").annotate(processing_time_in_section=Sum(F('end_date')-F('start_date')))
+    
+    for one_section in one_mail_follow_up_data:
+
+        one_section["processing_time_in_section"] = int(one_section["processing_time_in_section"].total_seconds()) / 60
+    
+
+    d["pie_chart_by_sections"] = one_mail_follow_up_data
+    return render(request, 'mail_details.html', d)
 
 
 def stat_all_mails(request):
@@ -71,8 +81,6 @@ def stat_all_mails(request):
     d["mails"] = d["mails"].values()
     d["mails"] = json.dumps(list(d["mails"]), default=date_handler)
 
-    print ">>> ..."
-    print d["mails"]
 
     return render(request, 'stat_all_mails.html', d)
 
@@ -97,9 +105,6 @@ def stat_not_closed_mails(request):
     not_closed_pie_data_3 = Track.objects.select_related().filter(end_date__isnull=True, mail__closed = "False").annotate(received_date=F('mail__received_time')).annotate(staff_f_name=F('staff__first_name')).annotate(staff_l_name=F('staff__last_name')).annotate(staff_section=F('staff__section__designation')).values('staff__first_name', 'staff__last_name').annotate(number_of_mails_for_one_staff=Count('staff__first_name'))
     d["not_closed_pie_data_3"] = not_closed_pie_data_3
 
-    print ">>> ..."
-    print not_closed_pie_data_3
-    
     return render(request, 'stat_not_closed_mails.html', d)
 
 

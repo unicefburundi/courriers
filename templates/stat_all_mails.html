@@ -82,8 +82,9 @@
 
 
 		function displayMailDetails(key=0){
-			mail_number = key.closest('tr').getElementsByTagName('td')[0].innerHTML;
+			//mail_number = key.closest('tr').getElementsByTagName('td')[0].innerHTML;
 
+			mail_number = key.closest('tr').getElementsByTagName('a')[0].innerHTML;
 			
 			window.open('mail_details/?mail_number='+mail_number,'','fullscreen=yes');
 		}

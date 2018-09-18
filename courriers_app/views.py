@@ -61,11 +61,12 @@ def mail_details(request, mail_number):
     mail_number = str(request.GET.get('mail_number', '')).strip()
 
     one_mail_follow_up_data = Track.objects.filter(mail__number = mail_number).values("staff__section__designation").annotate(processing_time_in_section=Sum(F('end_date')-F('start_date')))
-    
-    for one_section in one_mail_follow_up_data:
 
-        one_section["processing_time_in_section"] = int(one_section["processing_time_in_section"].total_seconds()) / 60
-    
+    for one_section in one_mail_follow_up_data:
+        if one_section["processing_time_in_section"]:
+            one_section["processing_time_in_section"] = int(one_section["processing_time_in_section"].total_seconds()) / 60
+        else:
+            one_section["processing_time_in_section"] = 0
 
     d["pie_chart_by_sections"] = one_mail_follow_up_data
     return render(request, 'mail_details.html', d)
@@ -182,6 +183,15 @@ def close_mail(request):
             the_mail.closed = True
             the_mail.closed_time = datetime.datetime.now()
             the_mail.save()
+
+            # Let's first record that the staff who was working on this mail finished his work
+            mail_related_track_records = Track.objects.filter(mail = the_mail)
+            last = mail_related_track_records[len(mail_related_track_records) - 1] if mail_related_track_records else None
+            if last is not None:
+                last.end_date = datetime.datetime.now()
+                last.save()
+            else:
+                pass
     return HttpResponse(response_data, content_type="application/json")
 
 def transfer_mail(request):

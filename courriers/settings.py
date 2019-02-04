@@ -132,7 +132,7 @@ STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'staticfiles'),
 )
 
-LOGIN_REDIRECT_URL = 'home'
+LOGIN_REDIRECT_URL = 'landing'
 
 try:
     from localsettings import *

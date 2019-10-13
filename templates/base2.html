@@ -230,16 +230,18 @@
 
 						<li><b><a role="button" href="{% url 'transfer_mail' %} ">{% trans "Transfer" %}</a></b></li>
 
+						<li><b><a role="button" href="{% url 'track_mails' %} ">{% trans "Track" %}</a></b></li>
+
 						<li><b><a role="button" href="{% url 'close_mail_view' %} ">{% trans "Close" %}</a></b></li>
 
 						<li role="presentation" class="dropdown">
 							<b><a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
       {% trans "Statistics" %} <span class="caret"></span>
     						</a></b>
-    						<ul class="dropdown-menu">
-      							<li><a href="/stat_all_mails">{% trans "All mails" %}</a></li>
-      							<li><a href="/stat_closed_mails">{% trans "Closed mails" %}</a></li>
-      							<li><a href="/stat_not_closed_mails">{% trans "Not closed mails" %}</a></li>
+    						<ul>
+      							<li><a href="/stat_all_mails">{% trans "All Mails & Invoices" %}</a></li>
+      							<li><a href="/stat_closed_mails">{% trans "Closed Mails & Invoices" %}</a></li>
+      							<li><a href="/stat_not_closed_mails">{% trans "Unclosed Mails & Invoices" %}</a></li>
     						</ul>
 
 						</li>
@@ -279,8 +281,8 @@
 								<div class="widget">
 									<div class="widget-wrap">
 										<p class="copyright text-muted small" style="text-align: center;">
-											© 2018
-												{% trans "V" %}
+											© 2018 - 2019
+												{% trans "Unicef Burundi" %}
 										</p>
 									</div>
 								</div>

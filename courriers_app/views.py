@@ -44,7 +44,11 @@ def new_mail(request):
     d["mail_types"] = MailType.objects.all()
     d["senders"] = Sender.objects.all()
     d["mails"] = Mail.objects.all()
-    d["mails"] = Mail.objects.all().annotate(sender_f_name = F('sender__first_name')).annotate(sender_l_name = F('sender__last_name')).annotate(mail_type_name = F('mail_type__mail_type_name'))
+    d["mails"] = (Mail.objects.all()
+        .annotate(sender_f_name = F('sender__first_name'))
+        .annotate(sender_l_name = F('sender__last_name'))
+        .annotate(mail_type_name = F('mail_type__mail_type_name'))
+        )
     d["mails"] = d["mails"].values()
     d["mails"] = json.dumps(list(d["mails"]), default=date_handler)
     return render(request, 'new_mail.html', d)
@@ -134,6 +138,22 @@ def save_mail(request):
 
         return HttpResponse(response_data, content_type="application/json")
 
+def transfer_mail(request):
+    d = {}
+    d["senders"] = Sender.objects.all()
+    d["staff"] = Staff.objects.all().annotate(section_name = F('section__designation'))
+    d["transfers"] = (Track.objects.all()
+        .annotate(sender_f_name = F('mail__sender__first_name'))
+        .annotate(sender_l_name = F('mail__sender__last_name'))
+        .annotate(mail_number = F('mail__number'))
+        .annotate(staff_f_name = F('staff__first_name'))
+        .annotate(staff_l_name = F('staff__last_name'))
+        .annotate(section = F('staff__section__designation'))
+        )
+    d["transfers"] = d["transfers"].values()
+    d["transfers"] = json.dumps(list(d["transfers"]), default=date_handler)
+    return render(request, 'transfer.html', d)
+
 def save_transfer(request):
     response_data = {}
     if request.method == 'POST':
@@ -154,8 +174,6 @@ def save_transfer(request):
             mail_record = mail_record[0]
         if len(staff_record) > 0:
             staff_record = staff_record[0]
-
-
         # Let's first record that the staff who is transfering this mail finished his work
         mail_related_track_records = Track.objects.filter(mail = mail_record)
         last = mail_related_track_records[len(mail_related_track_records) - 1] if mail_related_track_records else None
@@ -164,12 +182,35 @@ def save_transfer(request):
             last.save()
         else:
             pass
-
-
         Track.objects.create(mail = mail_record, staff = staff_record, purpose = comments)
-
         return HttpResponse(response_data, content_type="application/json")
 
+def track_mails(request):
+    d = {}
+    d["pagetitle"] = "Track mails"
+    return render(request, 'track_mails.html', d)
+
+def search_mail(request):
+    mail_history = ""
+    if request.method == 'POST':
+        json_data = json.loads(request.body)
+        mail_id = json_data['mail_id']
+        mail_id = mail_id.strip()
+        concerned_mail = Mail.objects.filter(number = mail_id)
+        if(len(concerned_mail) > 0):
+            concerned_mail = concerned_mail[0]
+            sender = concerned_mail.sender
+            received_time = concerned_mail.received_time
+            mail_history = (
+                Track.objects.filter(mail = concerned_mail)
+                .annotate(received_date=F('mail__received_time'))
+                .annotate(staff_f_name=F('staff__first_name'))
+                .annotate(staff_l_name=F('staff__last_name'))
+                .annotate(staff_section=F('staff__section__designation'))
+                )
+            mail_history = mail_history.values()
+            mail_history = json.dumps(list(mail_history), default=date_handler)
+    return HttpResponse(mail_history, content_type="application/json")
 
 def close_mail(request):
     response_data = {}
@@ -193,15 +234,6 @@ def close_mail(request):
             else:
                 pass
     return HttpResponse(response_data, content_type="application/json")
-
-def transfer_mail(request):
-    d = {}
-    d["senders"] = Sender.objects.all()
-    d["staff"] = Staff.objects.all().annotate(section_name = F('section__designation'))
-    d["transfers"] = Track.objects.all().annotate(sender_f_name = F('mail__sender__first_name')).annotate(sender_l_name = F('mail__sender__last_name')).annotate(mail_number = F('mail__number')).annotate(staff_f_name = F('staff__first_name')).annotate(staff_l_name = F('staff__last_name')).annotate(section = F('staff__section__designation'))
-    d["transfers"] = d["transfers"].values()
-    d["transfers"] = json.dumps(list(d["transfers"]), default=date_handler)
-    return render(request, 'transfer.html', d)
 
 def get_unclosed_mails(request):
     response_data = {}

@@ -148,61 +148,47 @@
 		function displayPieChart3(){
 			$('#pie_chart_3').empty();
 
-			var all_pie_data_list = [];
+			//var all_pie_data_list = [];
+			$('#staff_table').append('<p align="center"><b>{% trans "DETAILS" %}</b></p>' +
+
+												'<div style="clear:both; height:10px;"></div>' +
+
+												'<table id="tbl" class="table table-striped table-bordered table-condensed">');
+
+			$('#tbl').append('<thead>' +
+				'<th>{% trans "Staff" %}</th><th>{% trans "Number of Mails/Invoices" %}</th>' +
+			'</thead>' +
+				
+			'<tbody>' +
+				
+			'</tbody>');
+
+
 
 	        {% for one_data_type in not_closed_pie_data_3 %}
 	        	var one_item = {};
 	        	var name = "{{ one_data_type.staff__first_name }} "+"{{ one_data_type.staff__last_name }}";
 	        	var y = "{{ one_data_type.number_of_mails_for_one_staff }}";
 
+	        	$('#tbl').find('tbody').append('<tr style="cursor:pointer;"></tr>');
 
-	        	/*name = parseInt(name);
-	        	name = name+" days"*/
-	        	one_item["name"] = name;
-	        	one_item["y"] = parseInt(y);
-	        	all_pie_data_list.push(one_item);
+				$('#tbl tr:last').append('<td align="center">' + name +'</td>');
+				$('#tbl tr:last').append('<td align="center">' + y +'</td>');
 	        {% endfor %}
 
-	        var number_of_not_completed_mails = "{{ number_of_not_completed_mails }}";
-	        var chart_title = "<b> Not Completed Mails </b> - <i> Total : </i>"+number_of_not_completed_mails
-
-	        Highcharts.chart('pie_chart_3', {
-							        chart: {
-							            plotBackgroundColor: null,
-							            plotBorderWidth: null,
-							            plotShadow: false,
-							            type: 'pie'
-							        },
-							        title: {
-							            text: chart_title
-							        },
-							        tooltip: {
-							            pointFormat: 'Staff :    		<b>{point.name}</b><br>Number of mails : {point.y}<br>Percentage : <b>{point.percentage:.1f}%</b>'
-							        },
-							        plotOptions: {
-							            pie: {
-							                allowPointSelect: true,
-							                cursor: 'pointer',
-							                dataLabels: {
-							                    enabled: true,
-                								format: 'Staff :    		<b>{point.name}</b><br>Number of mails : {point.y}<br>Percentage : <b>{point.percentage:.1f}%</b>',
-                								style: {
-                    									color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
-                										}
-
-							                },
-							                showInLegend: true
-							            }
-							        },
-							        series: [{
-							            name: 'Percentages ',
-							            colorByPoint: true,
-							            data: all_pie_data_list
-							        }],
-							        credits: {
-									      enabled: false
-									  },
-							    });
+	        $('#tbl').DataTable({
+										dom: "<'row'<'col-sm-3'l><'col-sm-4'i><'col-sm-5'f>>" +
+											"<'row'<'col-sm-12'tr>>" +
+											"<'row'<'col-sm-4'B><'col-sm-8'p>>",
+										pagingType: "full_numbers",
+										lengthMenu: [
+								            [10, 25, 50, 100, -1 ],
+								            ['10', '25', '50', '100', 'All' ]
+								        ],
+								        buttons: [
+								            'copy', 'csv', 'excel', 'pdf', 'print'
+								        ]
+									});
 
 		}
 
@@ -257,7 +243,7 @@
 			
 		</div>
 
-		<div id="pie_chart_3" class="well col-sm-10">
+		<div id="staff_table" class="well col-sm-10">
 			
 		</div>
 

@@ -7,6 +7,8 @@
 	<script language="JavaScript">
 
 		function searchMail(){
+			$("#records_tbl").html("");
+
 			if ($('#mail_id').val() != ""){
 				mail_id = $('#mail_id').val();
 			}else{
@@ -29,60 +31,64 @@
 		            url: posturl,
 		            data: data,
 		            success: function (response) {
+		            	if(response != "N"){
 
-						$('#records_tbl').append('<p align="center"><b>{% trans "DETAILS" %}</b></p>' +
+							$('#records_tbl').append('<p align="center"><b>{% trans "DETAILS" %}</b></p>' +
 
-												'<div style="clear:both; height:10px;"></div>' +
+													'<div style="clear:both; height:10px;"></div>' +
 
-												'<table id="tbl" class="table table-striped table-bordered table-condensed">');
-												
-						$('#tbl').append('<thead>' +
-							'<th>{% trans "Staff" %}</th><th>{% trans "Section" %}</th><th>{% trans "Required Action" %}</th><th>{% trans "Reception Date" %}</th><th>{% trans "End Date" %}</th>' +
-						'</thead>' +
-							
-						'<tbody>' +
-							
-						'</tbody>');
+													'<table id="tbl" class="table table-striped table-bordered table-condensed">');
+													
+							$('#tbl').append('<thead>' +
+								'<th>{% trans "Staff" %}</th><th>{% trans "Section" %}</th><th>{% trans "Required Action" %}</th><th>{% trans "Reception Date" %}</th><th>{% trans "End Date" %}</th>' +
+							'</thead>' +
+								
+							'<tbody>' +
+								
+							'</tbody>');
 
 
-						for (i = 0; i < response.length; i++) {
-	                		staff_name = response[i].staff_f_name+" "+response[i].staff_l_name
-	                		staff_section = response[i].staff_section
-	                		required_action = response[i].purpose
+							for (i = 0; i < response.length; i++) {
+		                		staff_name = response[i].staff_f_name+" "+response[i].staff_l_name
+		                		staff_section = response[i].staff_section
+		                		required_action = response[i].purpose
 
-	                		reception_date = response[i].start_date
-	                		reception_date = reception_date.substring(0,19);
+		                		reception_date = response[i].start_date
+		                		reception_date = reception_date.substring(0,19);
 
-	                		end_date = response[i].end_date
-	                		if(end_date != null){
-	                			end_date = end_date.substring(0,19);
-	                		}
-	                		
+		                		end_date = response[i].end_date
+		                		if(end_date != null){
+		                			end_date = end_date.substring(0,19);
+		                		}
+		                		
 
-	                		$('#tbl').find('tbody').append('<tr style="cursor:pointer;"></tr>');
+		                		$('#tbl').find('tbody').append('<tr style="cursor:pointer;"></tr>');
 
-							$('#tbl tr:last').append('<td align="center">' + staff_name +'</td>');
-							$('#tbl tr:last').append('<td align="center">' + staff_section +'</td>');
-							$('#tbl tr:last').append('<td align="center">' + required_action +'</td>');
-							$('#tbl tr:last').append('<td align="center">' + reception_date +'</td>');
-							$('#tbl tr:last').append('<td align="center">' + end_date +'</td>');
+								$('#tbl tr:last').append('<td align="center">' + staff_name +'</td>');
+								$('#tbl tr:last').append('<td align="center">' + staff_section +'</td>');
+								$('#tbl tr:last').append('<td align="center">' + required_action +'</td>');
+								$('#tbl tr:last').append('<td align="center">' + reception_date +'</td>');
+								$('#tbl tr:last').append('<td align="center">' + end_date +'</td>');
+							}
+
+
+
+							$('#tbl').DataTable({
+											dom: "<'row'<'col-sm-3'l><'col-sm-4'i><'col-sm-5'f>>" +
+												"<'row'<'col-sm-12'tr>>" +
+												"<'row'<'col-sm-4'B><'col-sm-8'p>>",
+											pagingType: "full_numbers",
+											lengthMenu: [
+									            [10, 25, 50, 100, -1 ],
+									            ['10', '25', '50', '100', 'All' ]
+									        ],
+									        buttons: [
+									            'copy', 'csv', 'excel', 'pdf', 'print'
+									        ]
+										});
+						}else{
+							$('#records_tbl').append('<p align="center"><b style="color:red;">{% trans "No Records found" %}</b></p>');
 						}
-
-
-
-						$('#tbl').DataTable({
-										dom: "<'row'<'col-sm-3'l><'col-sm-4'i><'col-sm-5'f>>" +
-											"<'row'<'col-sm-12'tr>>" +
-											"<'row'<'col-sm-4'B><'col-sm-8'p>>",
-										pagingType: "full_numbers",
-										lengthMenu: [
-								            [10, 25, 50, 100, -1 ],
-								            ['10', '25', '50', '100', 'All' ]
-								        ],
-								        buttons: [
-								            'copy', 'csv', 'excel', 'pdf', 'print'
-								        ]
-									});
 
 
 

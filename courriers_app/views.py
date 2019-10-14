@@ -231,7 +231,9 @@ def search_mail(request):
                 .annotate(staff_section=F('staff__section__designation'))
                 )
             mail_history = mail_history.values()
-            mail_history = json.dumps(list(mail_history), default=date_handler)
+        else:
+            mail_history = "N"
+        mail_history = json.dumps(list(mail_history), default=date_handler)
     return HttpResponse(mail_history, content_type="application/json")
 
 def close_mail(request):

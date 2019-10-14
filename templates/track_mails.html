@@ -49,8 +49,15 @@
 	                		staff_name = response[i].staff_f_name+" "+response[i].staff_l_name
 	                		staff_section = response[i].staff_section
 	                		required_action = response[i].purpose
+
 	                		reception_date = response[i].start_date
+	                		reception_date = reception_date.substring(0,19);
+
 	                		end_date = response[i].end_date
+	                		if(end_date != null){
+	                			end_date = end_date.substring(0,19);
+	                		}
+	                		
 
 	                		$('#tbl').find('tbody').append('<tr style="cursor:pointer;"></tr>');
 

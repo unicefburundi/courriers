@@ -19,4 +19,9 @@ urlpatterns = [
     url(r'^stat_not_closed_mails$', views.stat_not_closed_mails, name='stat_not_closed_mails'),
     url(r'^mail_details/(?P<mail_number>)$', views.mail_details, name='mail_details'),
     url(r'^mail_details/(?P<mail_number>)$', views.mail_details, name='mail_details'),
+    url(
+        r'^get_on_process_mails_for_staff/(?P<staff_id>)$', 
+        views.get_on_process_mails_for_staff, 
+        name='get_on_process_mails_for_staff'
+        ),
 ]

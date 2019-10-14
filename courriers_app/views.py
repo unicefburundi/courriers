@@ -64,7 +64,9 @@ def mail_details(request, mail_number):
     d = {}
     mail_number = str(request.GET.get('mail_number', '')).strip()
 
-    one_mail_follow_up_data = Track.objects.filter(mail__number = mail_number).values("staff__section__designation").annotate(processing_time_in_section=Sum(F('end_date')-F('start_date')))
+    one_mail_follow_up_data = (Track.objects.filter(mail__number = mail_number)
+        .values("staff__section__designation")
+        .annotate(processing_time_in_section=Sum(F('end_date')-F('start_date'))))
 
     for one_section in one_mail_follow_up_data:
         if one_section["processing_time_in_section"]:
@@ -91,7 +93,10 @@ def stat_all_mails(request):
 
 def stat_closed_mails(request):
     d = {}
-    closed_pie_data = Mail.objects.filter(closed = "True").annotate(processing_time=DiffDays(CastDate(F('closed_time'))-CastDate(F('received_time'))) + 1).values('processing_time').annotate(number_same_time=Count('processing_time'))
+    closed_pie_data = (Mail.objects.filter(closed = "True")
+        .annotate(processing_time=DiffDays(CastDate(F('closed_time'))-CastDate(F('received_time'))) + 1)
+        .values('processing_time')
+        .annotate(number_same_time=Count('processing_time')))
     d["number_of_completed_mails"] = Mail.objects.filter(closed = "True").count()
     d["closed_pie_data"] = closed_pie_data
     return render(request, 'stat_closed_mails.html', d)
@@ -100,14 +105,31 @@ def stat_not_closed_mails(request):
     d = {}
     current_date = datetime.datetime.now().date()
 
-    not_closed_pie_data = Mail.objects.filter(closed = "False").annotate(processing_time=DiffDays(CastDate(current_date)-CastDate(F('received_time'))) + 1).values('processing_time').annotate(number_same_time=Count('processing_time'))
+    not_closed_pie_data = (Mail.objects.filter(closed = "False")
+        .annotate(processing_time=DiffDays(CastDate(current_date)-CastDate(F('received_time'))) + 1)
+        .values('processing_time')
+        .annotate(number_same_time=Count('processing_time')))
     d["number_of_not_completed_mails"] = Mail.objects.filter(closed = "False").count()
     d["not_closed_pie_data"] = not_closed_pie_data
 
-    not_closed_pie_data_2 = Track.objects.select_related().filter(end_date__isnull=True, mail__closed = "False").annotate(received_date=F('mail__received_time')).annotate(staff_f_name=F('staff__first_name')).annotate(staff_l_name=F('staff__last_name')).annotate(staff_section=F('staff__section__designation')).values('staff_section').annotate(number_of_mails_in_section=Count('staff_section'))
+    not_closed_pie_data_2 = (Track.objects.select_related()
+        .filter(end_date__isnull=True, mail__closed = "False")
+        .annotate(received_date=F('mail__received_time'))
+        .annotate(staff_f_name=F('staff__first_name'))
+        .annotate(staff_l_name=F('staff__last_name'))
+        .annotate(staff_section=F('staff__section__designation'))
+        .values('staff_section')
+        .annotate(number_of_mails_in_section=Count('staff_section')))
     d["not_closed_pie_data_2"] = not_closed_pie_data_2
 
-    not_closed_pie_data_3 = Track.objects.select_related().filter(end_date__isnull=True, mail__closed = "False").annotate(received_date=F('mail__received_time')).annotate(staff_f_name=F('staff__first_name')).annotate(staff_l_name=F('staff__last_name')).annotate(staff_section=F('staff__section__designation')).values('staff__first_name', 'staff__last_name').annotate(number_of_mails_for_one_staff=Count('staff__first_name'))
+    not_closed_pie_data_3 = (Track.objects.select_related()
+        .filter(end_date__isnull=True, mail__closed = "False")
+        .annotate(received_date=F('mail__received_time'))
+        .annotate(staff_f_name=F('staff__first_name'))
+        .annotate(staff_l_name=F('staff__last_name'))
+        .annotate(staff_section=F('staff__section__designation'))
+        .values('staff__id', 'staff__first_name', 'staff__last_name', 'staff__section__designation')
+        .annotate(number_of_mails_for_one_staff=Count('staff__first_name')))
     d["not_closed_pie_data_3"] = not_closed_pie_data_3
 
     return render(request, 'stat_not_closed_mails.html', d)
@@ -272,3 +294,16 @@ def get_closed_mails(request):
 
     return HttpResponse(mails, content_type="application/json")
 
+
+def get_on_process_mails_for_staff(request, staff_id):
+    mails_under_processing = {}
+    staff_id = int(request.GET.get("staff_id", ""))
+    mails_under_processing["mails"] = (Track.objects.select_related()
+        .filter(end_date__isnull=True, mail__closed = "False", staff__id = staff_id)
+        .annotate(received_by_organization_date=F('mail__received_time'))
+        .annotate(sender_f_name=F('mail__sender__first_name'))
+        .annotate(sender_l_name=F('mail__sender__last_name'))
+        .annotate(mail_number=F('mail__number')))
+    mails_under_processing["mails"] = mails_under_processing["mails"].values()
+    mails_under_processing["mails"] = json.dumps(list(mails_under_processing["mails"]), default=date_handler)
+    return render(request, "on_process_mails_for_staff.html", mails_under_processing)

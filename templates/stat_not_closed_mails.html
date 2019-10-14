@@ -145,18 +145,25 @@
 
 
 
+		function displayMails(key=0){
+			staff_id = key.closest('tr').getElementsByTagName('td')[0].innerHTML;	
+			window.open('get_on_process_mails_for_staff/?staff_id='+staff_id,'','fullscreen=yes');
+			}
+
+
+
 		function displayPieChart3(){
 			$('#pie_chart_3').empty();
 
 			//var all_pie_data_list = [];
-			$('#staff_table').append('<p align="center"><b>{% trans "DETAILS" %}</b></p>' +
+			$('#staff_table').append('<p align="center"><b>{% trans "" %}</b></p>' +
 
 												'<div style="clear:both; height:10px;"></div>' +
 
 												'<table id="tbl" class="table table-striped table-bordered table-condensed">');
 
 			$('#tbl').append('<thead>' +
-				'<th>{% trans "Staff" %}</th><th>{% trans "Number of Mails/Invoices" %}</th>' +
+				'<th style="display:none">{% trans "Staff_id" %}</th><th>{% trans "Staff" %}</th><th>{% trans "Section" %}</th><th>{% trans "Number of Mails/Invoices" %}</th>' +
 			'</thead>' +
 				
 			'<tbody>' +
@@ -167,13 +174,17 @@
 
 	        {% for one_data_type in not_closed_pie_data_3 %}
 	        	var one_item = {};
+	        	staff_id = "{{ one_data_type.staff__id }}";
 	        	var name = "{{ one_data_type.staff__first_name }} "+"{{ one_data_type.staff__last_name }}";
+	        	var section = "{{ one_data_type.staff__section__designation }}";
 	        	var y = "{{ one_data_type.number_of_mails_for_one_staff }}";
 
 	        	$('#tbl').find('tbody').append('<tr style="cursor:pointer;"></tr>');
 
+				$('#tbl tr:last').append('<td align="center" style="display:none">' + staff_id +'</td>');
 				$('#tbl tr:last').append('<td align="center">' + name +'</td>');
-				$('#tbl tr:last').append('<td align="center">' + y +'</td>');
+				$('#tbl tr:last').append('<td align="center">' + section +'</td>');
+				$('#tbl tr:last').append('<td align="center"><a href="#" onclick = "displayMails(this)">' + y +'</a></td>');
 	        {% endfor %}
 
 	        $('#tbl').DataTable({
@@ -239,15 +250,15 @@
 
 
 	<div id="staffs" class="tab-pane fade">
-		<div class="col-sm-1">
+		<div class="col-sm-2">
 			
 		</div>
 
-		<div id="staff_table" class="well col-sm-10">
+		<div id="staff_table" class="well col-sm-8">
 			
 		</div>
 
-		<div class="col-sm-1">
+		<div class="col-sm-2">
 			
 		</div>
 	</div>

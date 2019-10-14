@@ -164,7 +164,7 @@ def transfer_mail(request):
     d = {}
     d["senders"] = Sender.objects.all()
     d["staff"] = Staff.objects.all().annotate(section_name = F('section__designation'))
-    d["transfers"] = (Track.objects.all()
+    d["transfers"] = (Track.objects.filter(end_date__isnull = True)
         .annotate(sender_f_name = F('mail__sender__first_name'))
         .annotate(sender_l_name = F('mail__sender__last_name'))
         .annotate(mail_number = F('mail__number'))

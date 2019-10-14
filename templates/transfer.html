@@ -29,14 +29,14 @@
 
 		function desplay_records(){
 
-			$('#records_tbl').append('<p align="center"><b>{% trans "RECORDED MAILS & INVOICES" %}</b></p>' +
+			$('#records_tbl').append('<p align="center"><b>{% trans "UNDER PROCESSING MAILS & INVOICES" %}</b></p>' +
 
 									'<div style="clear:both; height:10px;"></div>' +
 
 									'<table id="tbl" class="table table-striped table-bordered table-condensed">');
 									
 									$('#tbl').append('<thead>' +
-										'<th>{% trans "Sender First Name" %}</th><th>{% trans "Mail/Invoice" %}</th><th>{% trans "Transfer Date" %}</th><th>{% trans "Staff" %}</th><th>{% trans "Section" %}</th><th>{% trans "Action Required" %}</th><th>{% trans "End Date" %}</th>' +
+										'<th>{% trans "Mail/Invoice Number" %}</th><th>{% trans "Sender" %}</th><th>{% trans "Received by Staff" %}</th><th>{% trans "Staff" %}</th><th>{% trans "Section" %}</th><th>{% trans "Action Required" %}</th>' +
 									'</thead>' +
 										
 									'<tbody>' +
@@ -64,17 +64,16 @@
 										staff = records.json[i]["staff_f_name"];
 										section = records.json[i]["section"];
 										action = records.json[i]["purpose"];
-										end_date = records.json[i]["end_date"];
 
 										$('#tbl').find('tbody').append('<tr style="cursor:pointer;"></tr>');
 
-										$('#tbl tr:last').append('<td align="center">' + sender +'</td>');
+										
 										$('#tbl tr:last').append('<td align="center">' + mail_number +'</td>');
+										$('#tbl tr:last').append('<td align="center">' + sender +'</td>');
 										$('#tbl tr:last').append('<td align="center">' + transfer_date +'</td>');
 										$('#tbl tr:last').append('<td align="center">' + staff +'</td>');
 										$('#tbl tr:last').append('<td align="center">' + section +'</td>');
 										$('#tbl tr:last').append('<td align="center">' + action +'</td>');
-										$('#tbl tr:last').append('<td align="center">' + end_date +'</td>');
 									}
 
 									$('#tbl').DataTable({

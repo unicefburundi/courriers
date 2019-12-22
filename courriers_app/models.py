@@ -52,13 +52,17 @@ class MailType(models.Model):
 
 class Mail(models.Model):
     '''In this model, we will store mails and invoices'''
-    number = models.CharField(max_length=20, unique=True)
+    external_number = models.CharField(max_length=100, null=True)
+    number = models.CharField(max_length=100, unique=True)
     sender = models.ForeignKey(Sender)
     mail = models.ImageField(null=True)
     mail_type = models.ForeignKey(MailType)
-    received_time = models.DateTimeField(auto_now_add=True, blank=True)
+    received_time = models.DateTimeField(blank=True)
+    recorded_time = models.DateTimeField(auto_now_add=True, blank=True)
     closed = models.BooleanField(default=False)
     closed_time = models.DateTimeField(null=True)
+    need_answer = models.BooleanField(default=False)
+    answered = models.BooleanField(default=False)
 
     def __unicode__(self):
         return "{0} - Mail type : {1} - Registered {2}".format(self.sender.first_name, self.mail_type.mail_type_name, self.received_time)
@@ -68,6 +72,7 @@ class Track(models.Model):
     mail = models.ForeignKey(Mail)
     staff = models.ForeignKey(Staff)
     start_date = models.DateTimeField(auto_now_add=True, blank=True)
+    hard_copy_transfer_time = models.DateTimeField(null=True)
     purpose = models.CharField(max_length=100)
     end_date = models.DateTimeField(blank=True, null=True)
 

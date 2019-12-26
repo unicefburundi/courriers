@@ -58,11 +58,12 @@ class Mail(models.Model):
     mail = models.ImageField(null=True)
     mail_type = models.ForeignKey(MailType)
     received_time = models.DateTimeField(blank=True)
-    recorded_time = models.DateTimeField(auto_now_add=True, blank=True)
+    recorded_time = models.DateTimeField(auto_now_add=True, blank=True, null=True)
     closed = models.BooleanField(default=False)
     closed_time = models.DateTimeField(null=True)
     need_answer = models.BooleanField(default=False)
     answered = models.BooleanField(default=False)
+    soft_copy = models.FileField(upload_to ='uploads/% Y/% m/% d/', null=True)
 
     def __unicode__(self):
         return "{0} - Mail type : {1} - Registered {2}".format(self.sender.first_name, self.mail_type.mail_type_name, self.received_time)

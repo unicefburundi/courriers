@@ -1,0 +1,260 @@
+{% extends "base_1.html" %}
+{% load staticfiles %}
+{% load i18n %}
+{% load static %}
+
+{% block head %}
+	<script language="JavaScript">
+		$(document).ready(function() {
+
+			if ("{{ senders }}") {
+				{% for s in senders %}
+					$('#sender').append('<option value="{{ s.id }}">{{ s.first_name }} {{s.last_name}}</option>');
+				{% endfor %}
+			}
+			if ("{{ mails }}") {
+				{% for m in mails %}
+					$('#mail').append('<option value="{{ m.id }}">{{ m.id }}</option>');
+				{% endfor %}
+			}
+			if ("{{ staff }}") {
+				{% for s in staff %}
+					$('#staff').append('<option value="{{ s.id }}">{{ s.first_name }} {{ s.last_name }} - {{ s.section_name }}</option>');
+				{% endfor %}
+			}
+
+			desplay_records();
+
+		});
+
+		function desplay_records(){
+
+			$('#records_tbl').append('<p align="center"><b>{% trans "UNDER PROCESSING MAILS & INVOICES" %}</b></p>' +
+
+									'<div style="clear:both; height:10px;"></div>' +
+
+									'<table id="tbl" class="table table-striped table-bordered table-condensed">');
+									
+									$('#tbl').append('<thead>' +
+										'<th>{% trans "Mail/Invoice Number" %}</th><th>{% trans "Sender" %}</th><th>{% trans "Received by Staff" %}</th><th>{% trans "Staff" %}</th><th>{% trans "Section" %}</th><th>{% trans "Action Required" %}</th>' +
+									'</thead>' +
+										
+									'<tbody>' +
+										
+									'</tbody>');
+
+									var records = JSON.parse("{{transfers}}".replace(/&quot;/g,'"'));
+
+									records = { json: records };
+
+									var i;
+									var sender;
+									var mail_number;
+									var transfer_date;
+									var staff;
+									var section;
+									var action;
+									var end_date;
+
+									for (i = 0; i < records.json.length; i++){
+										sender = records.json[i]["sender_f_name"];
+										mail_number = records.json[i]["mail_number"];
+										transfer_date = records.json[i]["start_date"];
+										transfer_date = transfer_date.substring(0,19);
+										staff = records.json[i]["staff_f_name"];
+										section = records.json[i]["section"];
+										action = records.json[i]["purpose"];
+
+										$('#tbl').find('tbody').append('<tr style="cursor:pointer;"></tr>');
+
+										
+										$('#tbl tr:last').append('<td align="center">' + mail_number +'</td>');
+										$('#tbl tr:last').append('<td align="center">' + sender +'</td>');
+										$('#tbl tr:last').append('<td align="center">' + transfer_date +'</td>');
+										$('#tbl tr:last').append('<td align="center">' + staff +'</td>');
+										$('#tbl tr:last').append('<td align="center">' + section +'</td>');
+										$('#tbl tr:last').append('<td align="center">' + action +'</td>');
+									}
+
+									$('#tbl').DataTable({
+										dom: "<'row'<'col-sm-3'l><'col-sm-4'i><'col-sm-5'f>>" +
+											"<'row'<'col-sm-12'tr>>" +
+											"<'row'<'col-sm-4'B><'col-sm-8'p>>",
+										pagingType: "full_numbers",
+										lengthMenu: [
+								            [10, 25, 50, 100, -1 ],
+								            ['10', '25', '50', '100', 'All' ]
+								        ],
+								        buttons: [
+								            'copy', 'csv', 'excel', 'pdf', 'print'
+								        ]
+									});
+
+
+		}
+
+		function transferMail(){
+
+			if ($('#sender').val() != ""){
+				sender = $('#sender').val();
+			}else{
+				return;
+			}
+			if ($('#mail').val() != ""){
+				mail = $('#mail').val();
+			}else{
+				return;
+			}
+			if ($('#staff').val() != ""){
+				staff = $('#staff').val();
+			}else{
+				return;
+			}
+			if ($('#comments').val() != ""){
+				comments = $('#comments').val();
+			}else{
+				return;
+			}
+
+			ajaxurl = 'save_transfer';
+			data = JSON.stringify({ 'sender': sender, 'mail': mail, 'staff': staff, 'comments': comments});
+
+
+			$("#records_tbl").html("");
+
+			ajaxpost(ajaxurl, data);
+
+			desplay_records();
+
+		}
+
+		function fetchmails(code) {
+			$("#mail option").each(function(){
+        		if ($(this).val()) {
+        			$(this).remove();
+        		}
+		    });
+
+		    $('#records_tbl').empty();
+			if (code) {
+				//initializesonic();
+
+				ajaxurl = 'get_unclosed_mails';
+				ajaxpostbackfunction = "fetch_mails";
+	            data = JSON.stringify({ 'code': code });
+
+	            ajaxpost(ajaxurl, data);
+	        }
+
+	        desplay_records();
+		}
+
+		function desplay_history(code){
+
+		}
+
+		function ajaxpost(posturl, data) {
+		        ajaxresults = null;
+		        $.ajax({
+		        	beforeSend: function(xhr, settings) {
+				        if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+				            xhr.setRequestHeader("X-CSRFToken", csrftoken);
+				        }
+				    },
+		            type: 'POST',
+		            url: posturl,
+		            data: data,
+		            //contentType: 'application/json; charset=utf-8',
+		            //dataType: 'json',
+
+		            success: function (response) {
+		            	if (ajaxpostbackfunction == "fetch_mails") {
+		                	for (i = 0; i < response.length; i++) {
+
+		                		var id = response[i]["number"];
+
+		                		$('#mail').append('<option value=' + id +'>' + id + '</option>');
+
+    						}
+    						// fetch wanted data
+		                }
+		            },
+		            failure: function (json) {
+		                console.log("Fail");
+		            },
+		            error: function (jqXHR, exception) {
+		                console.log("Error");
+		                console.log(exception);
+		            }
+		        })
+		}
+
+	</script>
+{% endblock %}
+
+
+{% block container %}
+
+
+	<div>
+		{% if msg %}
+			<div class="divmessage"><p>{{ msg }}</p></div>
+		{% endif %}
+		{% if err %}
+			<div class="diverror"><p>{{ err }}</p></div>
+		{% endif %}
+	</div>
+	
+	<div class="well">
+	<div align="center">
+		<div class="form-inline" style="padding-left :5px; padding-right :5px;">
+
+			<form method="post" enctype="multipart/form-data">
+			{% csrf_token %}
+
+
+			<div class="form-group">
+				<label for="sender">{% trans "Sender:" %}</label>
+				<select id="sender" class="form-control" style="width:140px"  onchange="fetchmails(this.value)" required="required">
+					<option value="" selected="selected">[ {% trans "Select the sender" %} ]</option>'
+				</select>
+			</div>
+
+			<div class="form-group">
+				<label for="mail">{% trans "Mail/Invoice:" %}</label>
+				<select id="mail" class="form-control" style="width:140px"  onchange="desplay_history(this.value)" required="required">
+					<option value="" selected="selected">[ {% trans "Select the sender" %} ]</option>'
+				</select>
+			</div>
+
+			<div class="form-group">
+				<label for="staff">{% trans "Staff:" %}</label>
+				<select id="staff" class="form-control" style="width:140px"   required="required">
+					<option value="" selected="selected">[ {% trans "Select a staff" %} ]</option>'
+				</select>
+			</div>
+
+			<div class="form-group">
+				<label for="comments">{% trans "Comments:" %}</label>
+				<textarea class="form-control" style="width:140px" id="comments" required="required"></textarea>
+			</div>
+
+
+			<button type="submit" onclick="transferMail()">Transfer</button>
+
+			</form>
+
+		</div>
+
+		<br/>
+		<br/>
+
+		<div id="records_tbl">
+
+		</div>
+
+	</div>
+	</div>
+
+
+{% endblock %}

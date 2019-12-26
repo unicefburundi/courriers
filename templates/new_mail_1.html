@@ -1,0 +1,294 @@
+{% extends "base_1.html" %}
+{% load staticfiles %}
+{% load i18n %}
+{% load static %}
+
+
+{% block head %}
+<script language="JavaScript">
+
+    $(document).ready(function() {
+
+      if ("{{ mail_types }}") {
+        {% for m in mail_types %}
+          $('#mail_type').append('<option value="{{ m.id }}">{{ m.mail_type_name }}</option>');
+        {% endfor %}
+      }
+      if ("{{ senders }}") {
+        {% for s in senders %}
+          $('#sender').append('<option value="{{ s.id }}">{{ s.first_name }} {{s.last_name}}</option>');
+        {% endfor %}
+      }
+
+      $(function() {
+        $('#datetimepicker').datetimepicker();
+
+      });
+
+    $(".custom-file-input").on("change", function() {
+      var fileName = $(this).val().split("\\").pop();
+      $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+    });
+
+      desplay_records();
+
+    });
+
+    function desplay_records(){
+
+      $('#records_tbl').append('<p align="center"><b>{% trans "RECORDED MAILS" %}</b></p>' +
+
+                  '<div style="clear:both; height:10px;"></div>' +
+
+                  '<table id="tbl" class="table table-striped table-bordered table-condensed">');
+                  
+                  $('#tbl').append('<thead>' +
+                    '<th align="center">{% trans "Internal Number" %}</th><th align="center">{% trans "External Number" %}</th><th>{% trans "Sender" %}</th><th>{% trans "Mail Type" %}</th><th>{% trans "Record date" %}</th>' +
+                  '</thead>' +
+                    
+                  '<tbody>' +
+                    
+                  '</tbody>');
+
+
+                  var records = JSON.parse("{{mails}}".replace(/\\n/g, "\\n")
+                    .replace(/\\'/g, "\\'")
+                    .replace(/\\\\/g, "\\\\")
+                    .replace(/\\:/g, '\\:')
+                    .replace(/\\"/g, '\\"')
+                    .replace(/\\&/g, "\\&")
+                    .replace(/\\r/g, "\\r")
+                    .replace(/\\t/g, "\\t")
+                    .replace(/\\b/g, "\\b")
+                    .replace(/\\f/g, "\\f")
+                    .replace(/[\u0000-\u0019]+/g,"")
+                    .replace(/&quot;/g,'"'));
+
+
+
+                  records = { json: records };
+
+      
+                  var i;
+                  var sender;
+                  var mail_type;
+                  var record_date;
+
+                  
+                  for (i = 0; i < records.json.length; i++){
+
+                  number = records.json[i]["number"];
+                  external_number = records.json[i]["external_number"];
+                  sender = records.json[i]["sender_f_name"];
+                  mail_type = records.json[i]["mail_type_name"];
+                  record_date = records.json[i]["received_time"];
+                  record_date = record_date.substring(0,19);
+                  $('#tbl').find('tbody').append('<tr style="cursor:pointer;"></tr>');
+
+                    $('#tbl tr:last').append('<td align="center">' + number +'</td>');
+                    $('#tbl tr:last').append('<td align="center">' + external_number +'</td>');
+                    $('#tbl tr:last').append('<td align="center">' + sender +'</td>');
+                    $('#tbl tr:last').append('<td align="center">'+ mail_type +'</a></td>');
+                    $('#tbl tr:last').append('<td align="center">'+ record_date +'</a></td>');
+                  }
+
+                  
+                  $('#tbl').DataTable({
+                    dom: "<'row'<'col-sm-3'l><'col-sm-4'i><'col-sm-5'f>>" +
+                      "<'row'<'col-sm-12'tr>>" +
+                      "<'row'<'col-sm-4'B><'col-sm-8'p>>",
+                    pagingType: "full_numbers",
+                    lengthMenu: [
+                            [10, 25, 50, 100, -1 ],
+                            ['10', '25', '50', '100', 'All' ]
+                        ],
+                        buttons: [
+                            'copy', 'csv', 'excel', 'pdf', 'print'
+                        ]
+                  });
+
+    }
+
+
+    function saveMail() {
+
+      if ($('#mail_type').val() != ""){
+        mail_type = $('#mail_type').val();
+      }else{
+        return;
+      }
+
+      if ($('#sender').val() != ""){
+        sender = $('#sender').val();
+      }else{
+        return;
+      }
+
+      if ($('#external_mail_number').val() != ""){
+        external_mail_number = $('#external_mail_number').val();
+      }else{
+        external_mail_number = null;
+      }
+
+      if ($('#mail_number').val() != ""){
+        mail_number = $('#mail_number').val();
+      }else{
+        return;
+      }
+
+      if ($('#datetimepicker').val() != ""){
+        datetimepicked = $('#datetimepicker').val();
+      }else{
+        return;
+      }
+
+      if ($('#softCopy').val() != ""){
+        softCopy = $('#softCopy').val();
+      }else{
+        softCopy = null;
+      }
+
+      if ($('#answerNeeded').val() != ""){
+        answerNeeded = $('#answerNeeded').val();
+      }else{
+        return;
+      }
+
+      ajaxurl = 'save_mail_1';
+      data = JSON.stringify({ 'mail_type': mail_type, 'sender': sender, 'mail_number': mail_number, 'external_mail_number': external_mail_number, 'datetimepicked': datetimepicked, 'softCopy': softCopy, 'answerNeeded': answerNeeded});
+
+      ajaxpost(ajaxurl, data);
+
+      $("#records_tbl").html("");
+
+      desplay_records();
+    }
+
+
+    function ajaxpost(posturl, data) {
+            ajaxresults = null;
+            $.ajax({
+              beforeSend: function(xhr, settings) {
+                if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                }
+            },
+                type: 'POST',
+                url: posturl,
+                data: data,
+                contentType: 'application/json; charset=utf-8',
+                dataType: 'json',
+
+                success: function (response) {
+                  console.log("Success");
+                },
+                failure: function (json) {
+                    console.log("Fail");
+                },
+                error: function (jqXHR, exception) {
+                    console.log("Error");
+                }
+            })
+    }
+
+
+</script>
+{% endblock %}
+
+
+{% block container %}
+
+
+<div class="well">
+<div align="center">
+  <div class="form-inline" style="padding-left :5px; padding-right :5px;">
+
+    <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="container">
+        <div class="row">
+            <div class="form-group">
+              <label for="mail_type">{% trans "Mail Type:" %}</label>
+              <select id="mail_type" class="form-control" style="width:140px"  required="required">
+                <option value="" selected="selected">[ {% trans "Select mail type" %} ]</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label for="sender">{% trans "Sender:" %}</label>
+              <select id="sender" class="form-control" style="width:140px"  required="required">
+                <option value="" selected="selected">[ {% trans "Select the sender" %} ]</option>'
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="external_mail_number">{% trans "External Number:" %}</label>
+              <input type="text" class="form-control" style="width:140px" id="external_mail_number" required="required">
+            </div>
+
+            <div class="form-group">
+              <label for="mail_number">{% trans "Internal Number:" %}</label>
+              <input type="text" class="form-control" style="width:140px" id="mail_number" required="required">
+            </div>
+        </div>
+
+        <br>
+        <br>
+
+        <div class="row">
+            
+
+            <div class="form-group">
+              <label for="datetimepicker">{% trans "Reception Date and Time:" %}</label>
+              <div class='input-group date'>
+                <input type='text' class="form-control" id='datetimepicker'/>
+                <span class="input-group-addon">
+                    <span class="glyphicon glyphicon-calendar"></span>
+                </span>
+              </div>
+            </div>
+
+
+            <div class="form-group custom-file">
+              <input type="file" class="custom-file-input" id="softCopy">
+            </div>
+        </div>
+
+        <br>
+        <br>
+
+        <div class="row">
+            <div class="form-group custom-control custom-checkbox">
+              <label class="custom-control-label" for="answerNeeded">Answer Needed</label>
+              <input type="checkbox" class="custom-control-input" id="answerNeeded">
+            </div>
+        </div>
+
+        <br>
+        <br>    
+
+        <div class="row">
+            <button type="button" onclick="saveMail()">Save</button>
+        </div>
+
+    </div>
+    </form>
+
+  </div>
+
+  <br/>
+  <br/>
+
+  <div id="records_tbl">
+
+  </div>
+
+</div>
+</div>
+
+
+
+  
+  </body>
+
+{% endblock %}

@@ -53,6 +53,26 @@ def new_mail(request):
     d["mails"] = json.dumps(list(d["mails"]), default=date_handler)
     return render(request, 'new_mail.html', d)
 
+
+def new_mail_1(request):
+    if request.method == 'POST':
+        mail_type = request.POST.get('mail_type')
+        sender = request.POST.get('sender')
+
+    d = {}
+    d["pagetitle"] = "New mails"
+    d["mail_types"] = MailType.objects.all()
+    d["senders"] = Sender.objects.all()
+    d["mails"] = Mail.objects.all()
+    d["mails"] = (Mail.objects.all()
+        .annotate(sender_f_name = F('sender__first_name'))
+        .annotate(sender_l_name = F('sender__last_name'))
+        .annotate(mail_type_name = F('mail_type__mail_type_name'))
+        )
+    d["mails"] = d["mails"].values()
+    d["mails"] = json.dumps(list(d["mails"]), default=date_handler)
+    return render(request, 'new_mail_1.html', d)
+
 def close_mail_view(request):
     d = {}
     d["senders"] = Sender.objects.all()
@@ -143,6 +163,7 @@ def save_mail(request):
         mail_type = json_data['mail_type']
         sender = json_data['sender']
         mail_number = json_data['mail_number']
+        external_mail_number = json_data['external_mail_number']
         
         mail_type_object = MailType.objects.filter(id=mail_type)
         sender_object = Sender.objects.filter(id=sender)
@@ -156,9 +177,55 @@ def save_mail(request):
         if len(existing_mail) > 0:
             print "Error. A record with that number already exists."
         else:
-            Mail.objects.create(number = mail_number, sender = sender_object, mail_type = mail_type_object)
+            Mail.objects.create(external_number = external_mail_number, number = mail_number, sender = sender_object, mail_type = mail_type_object)
 
         return HttpResponse(response_data, content_type="application/json")
+
+def save_mail_1(request):
+    response_data = {}
+    if request.method == 'POST':
+        #import pdb; pdb.set_trace()
+        json_data = json.loads(request.body)
+        mail_type = json_data['mail_type']
+        sender = json_data['sender']
+        mail_number = json_data['mail_number']
+        external_mail_number = json_data['external_mail_number']
+        datetimepicked = json_data['datetimepicked']
+        date_time_picked = datetime.datetime.strptime(datetimepicked, '%m/%d/%Y %I:%M %p')
+        softCopy = json_data['softCopy']
+        answerNeeded = json_data['answerNeeded']
+        if answerNeeded:
+            answer_needed = True
+        else:
+            answer_needed = False
+
+        print("===")
+        print(mail_type)
+        print(sender)
+        print(mail_number)
+        print(external_mail_number)
+        print(datetimepicked)
+        print(type(datetimepicked))
+        print(softCopy)
+        print(answerNeeded)
+        print("---")
+
+        mail_type_object = MailType.objects.filter(id=mail_type)
+        sender_object = Sender.objects.filter(id=sender)
+
+        if len(mail_type_object) > 0:
+            mail_type_object = mail_type_object[0]
+        if len(sender_object) > 0:
+            sender_object = sender_object[0]
+
+        existing_mail = Mail.objects.filter(number = mail_number)
+        if len(existing_mail) > 0:
+            print "Error. A record with that number already exists."
+        else:
+            Mail.objects.create(external_number = external_mail_number, number = mail_number, sender = sender_object, mail_type = mail_type_object, need_answer = answer_needed, received_time = date_time_picked, soft_copy = softCopy)
+        
+        return HttpResponse(response_data, content_type="application/json")
+
 
 def transfer_mail(request):
     d = {}
@@ -175,6 +242,24 @@ def transfer_mail(request):
     d["transfers"] = d["transfers"].values()
     d["transfers"] = json.dumps(list(d["transfers"]), default=date_handler)
     return render(request, 'transfer.html', d)
+
+
+def transfer_mail_1(request):
+    d = {}
+    d["senders"] = Sender.objects.all()
+    d["staff"] = Staff.objects.all().annotate(section_name = F('section__designation'))
+    d["transfers"] = (Track.objects.filter(end_date__isnull = True)
+        .annotate(sender_f_name = F('mail__sender__first_name'))
+        .annotate(sender_l_name = F('mail__sender__last_name'))
+        .annotate(mail_number = F('mail__number'))
+        .annotate(staff_f_name = F('staff__first_name'))
+        .annotate(staff_l_name = F('staff__last_name'))
+        .annotate(section = F('staff__section__designation'))
+        )
+    d["transfers"] = d["transfers"].values()
+    d["transfers"] = json.dumps(list(d["transfers"]), default=date_handler)
+    return render(request, 'transfer_1.html', d)
+
 
 def save_transfer(request):
     response_data = {}

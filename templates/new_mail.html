@@ -5,9 +5,13 @@
 
 
 {% block head %}
+
+
 	<script language="JavaScript">
 
 		$(document).ready(function() {
+
+			
 
 			if ("{{ mail_types }}") {
 				{% for m in mail_types %}
@@ -91,11 +95,19 @@
 			}else{
 				return;
 			}
+
 			if ($('#sender').val() != ""){
 				sender = $('#sender').val();
 			}else{
 				return;
 			}
+
+			if ($('#external_mail_number').val() != ""){
+				external_mail_number = $('#external_mail_number').val();
+			}else{
+				return;
+			}
+
 			if ($('#mail_number').val() != ""){
 				mail_number = $('#mail_number').val();
 			}else{
@@ -103,7 +115,7 @@
 			}
 
 			ajaxurl = 'save_mail';
-			data = JSON.stringify({ 'mail_type': mail_type, 'sender': sender, 'mail_number': mail_number});
+			data = JSON.stringify({ 'mail_type': mail_type, 'sender': sender, 'mail_number': mail_number, 'external_mail_number': external_mail_number});
 
 			ajaxpost(ajaxurl, data);
 
@@ -140,6 +152,14 @@
 		}
 
 
+	/*$(function() {
+			  
+	  $('#datetimepicker2').datepicker({
+	            format: 'MM/DD/YYYY HH:mm'
+	  });
+	});*/
+
+
 	</script>
 {% endblock %}
 
@@ -160,31 +180,46 @@
 	<div align="center">
 		<div class="form-inline" style="padding-left :5px; padding-right :5px;">
 
+		
+
 			<form method="post" enctype="multipart/form-data">
 			{% csrf_token %}
 
-			<div class="form-group">
-				<label for="mail_type">{% trans "Type:" %}</label>
-				<select id="mail_type" class="form-control" style="width:140px"  required="required">
-					<option value="" selected="selected">[ {% trans "Select mail type" %} ]</option>
-				</select>
-			</div>
-			
-			<div class="form-group">
-				<label for="sender">{% trans "Sender:" %}</label>
-				<select id="sender" class="form-control" style="width:140px"  required="required">
-					<option value="" selected="selected">[ {% trans "Select the sender" %} ]</option>'
-				</select>
+			<div class="container">
+			<div class="row">
+				<div class="form-group">
+					<label for="mail_type">{% trans "Type:" %}</label>
+					<select id="mail_type" class="form-control" style="width:140px"  required="required">
+						<option value="" selected="selected">[ {% trans "Select mail type" %} ]</option>
+					</select>
+				</div>
+				
+				<div class="form-group">
+					<label for="sender">{% trans "Sender:" %}</label>
+					<select id="sender" class="form-control" style="width:140px"  required="required">
+						<option value="" selected="selected">[ {% trans "Select the sender" %} ]</option>'
+					</select>
+				</div>
+
+				<div class="form-group">
+					<label for="external_mail_number">{% trans "External Number:" %}</label>
+					<input type="text" class="form-control" style="width:140px" id="external_mail_number" required="required">
+				</div>
 			</div>
 
-			<div class="form-group">
-				<label for="mail_number">{% trans "Number:" %}</label>
-				<input type="text" class="form-control" style="width:140px" id="mail_number" required="required">
-			</div>
+				<div class="form-group">
+					<label for="mail_number">{% trans "Internal Number:" %}</label>
+					<input type="text" class="form-control" style="width:140px" id="mail_number" required="required">
+				</div>
 
-			<button type="submit" onclick="saveMail()">Save</button>
+
+				<button type="submit" onclick="saveMail()">Save</button>
+
+			</div>
 
 			</form>
+
+		
 
 		</div>
 

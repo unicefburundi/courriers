@@ -13,6 +13,7 @@ urlpatterns = [
     url(r'^get_unclosed_mails$', views.get_unclosed_mails, name='get_unclosed_mails'),
     url(r'^get_closed_mails$', views.get_closed_mails, name='get_closed_mails'),
     url(r'^save_transfer$', views.save_transfer, name='save_transfer'),
+    url(r'^save_transfer_1$', views.save_transfer_1, name='save_transfer_1'),
     url(r'^search_mail$', views.search_mail, name='search_mail'),
     url(r'^track_mails$', views.track_mails, name='track_mails'),
     url(r'^close_mail_view$', views.close_mail_view, name='close_mail_view'),

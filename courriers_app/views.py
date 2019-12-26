@@ -199,17 +199,6 @@ def save_mail_1(request):
         else:
             answer_needed = False
 
-        print("===")
-        print(mail_type)
-        print(sender)
-        print(mail_number)
-        print(external_mail_number)
-        print(datetimepicked)
-        print(type(datetimepicked))
-        print(softCopy)
-        print(answerNeeded)
-        print("---")
-
         mail_type_object = MailType.objects.filter(id=mail_type)
         sender_object = Sender.objects.filter(id=sender)
 
@@ -290,6 +279,40 @@ def save_transfer(request):
         else:
             pass
         Track.objects.create(mail = mail_record, staff = staff_record, purpose = comments)
+        return HttpResponse(response_data, content_type="application/json")
+
+
+def save_transfer_1(request):
+    response_data = {}
+    if request.method == 'POST':
+        #import pdb; pdb.set_trace()
+        json_data = json.loads(request.body)
+        sender = int(json_data['sender'])
+        mail = json_data['mail']
+        staff = json_data['staff']
+        datetimepicked = json_data['hard_copy_transfer_date']
+        hard_copy_transfer_date = datetime.datetime.strptime(datetimepicked, '%m/%d/%Y %I:%M %p')
+        comments = json_data['comments']
+
+        sender_record = Sender.objects.filter(id=sender)
+        mail_record = Mail.objects.filter(number=mail)
+        staff_record = Staff.objects.filter(id=staff)
+
+        if len(sender_record) > 0:
+            sender_record = sender_record[0]
+        if len(mail_record) > 0:
+            mail_record = mail_record[0]
+        if len(staff_record) > 0:
+            staff_record = staff_record[0]
+        mail_related_track_records = Track.objects.filter(mail = mail_record)
+        last = mail_related_track_records[len(mail_related_track_records) - 1] if mail_related_track_records else None
+        if last is not None:
+            last.end_date = datetime.datetime.now()
+            last.save()
+        else:
+            pass
+
+        Track.objects.create(mail = mail_record, staff = staff_record, hard_copy_transfer_time = hard_copy_transfer_date, purpose = comments)
         return HttpResponse(response_data, content_type="application/json")
 
 def track_mails(request):

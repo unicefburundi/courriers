@@ -9,6 +9,7 @@ import json
 from django.db.models import F, Count, Func, Sum
 import datetime
 from django.core import serializers
+import unicodedata
 
 
 class DiffDays(Func):
@@ -189,12 +190,18 @@ def save_mail_1(request):
         mail_type = json_data['mail_type']
         sender = json_data['sender']
         mail_number = json_data['mail_number']
+        answer_is_needed = json_data['answerNeeded']
         external_mail_number = json_data['external_mail_number']
         datetimepicked = json_data['datetimepicked']
         date_time_picked = datetime.datetime.strptime(datetimepicked, '%m/%d/%Y %I:%M %p')
-        softCopy = json_data['softCopy']
-        answerNeeded = json_data['answerNeeded']
-        if answerNeeded:
+        soft_copy_fake_url = json_data['softCopy']
+        soft_copy_fake_url = (
+            unicodedata.normalize('NFKD', soft_copy_fake_url)
+            .encode('ascii','ignore')
+            )
+        soft_copy_fake_url = soft_copy_fake_url.split("\\")
+        soft_copy = soft_copy_fake_url[2]
+        if answer_is_needed:
             answer_needed = True
         else:
             answer_needed = False
@@ -211,7 +218,14 @@ def save_mail_1(request):
         if len(existing_mail) > 0:
             print "Error. A record with that number already exists."
         else:
-            Mail.objects.create(external_number = external_mail_number, number = mail_number, sender = sender_object, mail_type = mail_type_object, need_answer = answer_needed, received_time = date_time_picked, soft_copy = softCopy)
+            Mail.objects.create(
+                external_number = external_mail_number, 
+                number = mail_number, sender = sender_object, 
+                mail_type = mail_type_object, 
+                need_answer = answer_needed, 
+                received_time = date_time_picked, 
+                soft_copy = soft_copy
+                )
         
         return HttpResponse(response_data, content_type="application/json")
 
@@ -312,7 +326,13 @@ def save_transfer_1(request):
         else:
             pass
 
-        Track.objects.create(mail = mail_record, staff = staff_record, hard_copy_transfer_time = hard_copy_transfer_date, purpose = comments)
+        Track.objects.create(
+            mail = mail_record, 
+            staff = staff_record, 
+            hard_copy_transfer_time = hard_copy_transfer_date, 
+            purpose = comments
+            )
+
         return HttpResponse(response_data, content_type="application/json")
 
 def track_mails(request):

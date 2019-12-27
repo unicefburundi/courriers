@@ -28,6 +28,8 @@
     $(".custom-file-input").on("change", function() {
       var fileName = $(this).val().split("\\").pop();
       $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+
+
     });
 
       desplay_records();
@@ -178,6 +180,7 @@
                 data: data,
                 contentType: 'application/json; charset=utf-8',
                 dataType: 'json',
+                //enctype: 'multipart/form-data'
 
                 success: function (response) {
                   console.log("Success");
@@ -236,8 +239,6 @@
         <br>
 
         <div class="row">
-            
-
             <div class="form-group">
               <label for="datetimepicker">{% trans "Reception Date and Time:" %}</label>
               <div class='input-group date'>
@@ -247,10 +248,16 @@
                 </span>
               </div>
             </div>
+        </div>
 
+        <br>
+        <br>
 
-            <div class="form-group custom-file">
-              <input type="file" class="custom-file-input" id="softCopy">
+        <div class="row">
+            <div class="custom-file form-group">
+              <!--<label class="custom-file-label" for="softCopy">Mail Soft Copy</label>-->
+              <!--<input type="file" class="custom-file-input" id="softCopy">-->
+              <input type="file" class="file" id="softCopy">
             </div>
         </div>
 

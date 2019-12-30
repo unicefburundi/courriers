@@ -1,5 +1,6 @@
 {% load i18n %}
 {% load staticfiles %}
+{% load template_tag %}
 
 <!doctype html>
 <html lang="en">
@@ -247,7 +248,9 @@
 					
 						<li><b><a role="button" href="{% url 'landing' %} ">{% trans "Home" %}</a></b></li>
 
+						{% if request.user|has_group:"Receptionist" %}
 						<li><b><a role="button" href="{% url 'new_mail_1' %} ">{% trans "New" %}</a></b></li>
+						{% endif %}
 
 						<li><b><a role="button" href="{% url 'transfer_mail_1' %} ">{% trans "Transfer" %}</a></b></li>
 

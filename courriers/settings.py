@@ -67,6 +67,10 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'django.template.context_processors.media',
             ],
+            'libraries':{
+                'template_tag': 'courriers_app.templatetag.template_tag',
+
+            }
         },
     },
 ]

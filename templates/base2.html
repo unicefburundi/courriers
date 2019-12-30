@@ -225,6 +225,7 @@
 									{% if user.is_authenticated %}
 										<div class="col-sm-1" >
 											<li><a role="button" href="/logout">{% trans "Logout" %}</a></li>
+											<li><a role="button" href="{% url 'password_change' %}">{% trans "Change password" %}</a></li>
 										</div>
 									{% else %}
 										<div class="col-sm-1" >

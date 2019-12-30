@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'courriers_app',
+    'django_bootstrap_base_template',
 ]
 
 MIDDLEWARE = [

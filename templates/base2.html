@@ -226,7 +226,6 @@
 									{% if user.is_authenticated %}
 										<div class="col-sm-1" >
 											<li><a role="button" href="/logout">{% trans "Logout" %}</a></li>
-											<li><a role="button" href="{% url 'password_change' %}">{% trans "Change password" %}</a></li>
 										</div>
 									{% else %}
 										<div class="col-sm-1" >
@@ -267,7 +266,15 @@
       							<li><a href="/stat_closed_mails">{% trans "Processed" %}</a></li>
       							<li><a href="/stat_all_mails">{% trans "All Mails & Invoices" %}</a></li>
     						</ul>
+						</li>
 
+						<li role="presentation" class="dropdown">
+							<b><a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+      {% trans "Profile" %} <span class="caret"></span>
+    						</a></b>
+    						<ul>
+    							<li><a href="{% url 'password_change' %}">{% trans "Change Password" %}</a></li>
+    						</ul>
 						</li>
 
 

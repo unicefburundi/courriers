@@ -2,6 +2,9 @@
 from __future__ import unicode_literals
 
 from django.db import models
+from django.contrib.auth.models import User
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 # Create your models here.
 
@@ -31,17 +34,27 @@ class Section(models.Model):
         return "{0}".format(self.designation)
 
 class Staff(models.Model):
-    '''In this model, we will store sections'''
-    first_name = models.CharField(max_length=50)
-    last_name = models.CharField(max_length=50)
+    '''In this model, we will store Staff details'''
+    user = models.OneToOneField(User, on_delete=models.CASCADE, null=True)
+    first_name = models.CharField(max_length=50, null=True)
+    last_name = models.CharField(max_length=50, null=True)
     section = models.ForeignKey(Section)
     function = models.ForeignKey(StaffPosition)
-    email = models.EmailField(max_length=100)
+    #email = models.EmailField(max_length=100)
     office_phone_number = models.CharField(max_length=20)
     mobile_phone_number = models.CharField(max_length=20)
 
     def __unicode__(self):
         return "{0} {1}".format(self.first_name, self.last_name)
+
+@receiver(post_save, sender=User)
+def create_user_profile(sender, instance, created, **kwargs):
+    if created:
+        Staff.objects.create(user=instance)
+
+@receiver(post_save, sender=User)
+def save_user_profile(sender, instance, **kwargs):
+    instance.staff.save()
 
 class MailType(models.Model):
     '''In this model, we will store mail types'''

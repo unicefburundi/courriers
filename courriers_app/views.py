@@ -10,6 +10,7 @@ from django.db.models import F, Count, Func, Sum
 import datetime
 from django.core import serializers
 import unicodedata
+from django.core.mail import send_mail
 
 
 class DiffDays(Func):
@@ -332,6 +333,22 @@ def save_transfer_1(request):
             hard_copy_transfer_time = hard_copy_transfer_date, 
             purpose = comments
             )
+        mail_external_number = mail_record.external_number
+        mail_internal_number = mail_record.number
+
+        e_mail_body = ("Dear Unicef Staff, "+
+            "a mail with "+mail_external_number+" as external number "+
+            "and "+mail_internal_number+" as internal number "+
+            "has been sent to you for processing. "+
+            "Best regards.")
+
+        e_mail_subject = "Push and Track - A mail has been sent to you for processing"
+
+        e_mail_sender = "noreply@pushandtrack.org"
+
+        e_mail_receiver = staff_record.user.email
+
+        send_mail(e_mail_subject, e_mail_body, e_mail_sender, [e_mail_receiver,])
 
         return HttpResponse(response_data, content_type="application/json")
 

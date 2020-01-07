@@ -322,7 +322,8 @@ def save_transfer_1(request):
         mail_related_track_records = Track.objects.filter(mail = mail_record)
         last = mail_related_track_records[len(mail_related_track_records) - 1] if mail_related_track_records else None
         if last is not None:
-            last.end_date = datetime.datetime.now()
+            #last.end_date = datetime.datetime.now()
+            last.end_date = hard_copy_transfer_date
             last.save()
         else:
             pass

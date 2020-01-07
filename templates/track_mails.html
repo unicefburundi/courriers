@@ -53,8 +53,10 @@
 		                		staff_section = response[i].staff_section
 		                		required_action = response[i].purpose
 
-		                		reception_date = response[i].start_date
-		                		reception_date = reception_date.substring(0,19);
+		                		reception_date = response[i].hard_copy_transfer_time;
+								if(reception_date){
+									reception_date = reception_date.substring(0,19);
+								}
 
 		                		end_date = response[i].end_date
 		                		if(end_date != null){

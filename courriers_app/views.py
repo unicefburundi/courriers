@@ -195,13 +195,13 @@ def save_mail_1(request):
         external_mail_number = json_data['external_mail_number']
         datetimepicked = json_data['datetimepicked']
         date_time_picked = datetime.datetime.strptime(datetimepicked, '%m/%d/%Y %I:%M %p')
-        soft_copy_fake_url = json_data['softCopy']
-        soft_copy_fake_url = (
+        #soft_copy_fake_url = json_data['softCopy']
+        '''soft_copy_fake_url = (
             unicodedata.normalize('NFKD', soft_copy_fake_url)
             .encode('ascii','ignore')
             )
         soft_copy_fake_url = soft_copy_fake_url.split("\\")
-        soft_copy = soft_copy_fake_url[2]
+        soft_copy = soft_copy_fake_url[2]'''
         if answer_is_needed:
             answer_needed = True
         else:
@@ -225,7 +225,7 @@ def save_mail_1(request):
                 mail_type = mail_type_object, 
                 need_answer = answer_needed, 
                 received_time = date_time_picked, 
-                soft_copy = soft_copy
+                #soft_copy = soft_copy
                 )
         
         return HttpResponse(response_data, content_type="application/json")
@@ -336,7 +336,7 @@ def save_transfer_1(request):
         mail_external_number = mail_record.external_number
         mail_internal_number = mail_record.number
 
-        e_mail_body = ("Dear Unicef Staff, "+
+        e_mail_body = ("Dear "+staff_record.first_name+", "+
             "a mail with "+mail_external_number+" as external number "+
             "and "+mail_internal_number+" as internal number "+
             "has been sent to you for processing. "+
@@ -348,7 +348,9 @@ def save_transfer_1(request):
 
         e_mail_receiver = staff_record.user.email
 
-        send_mail(e_mail_subject, e_mail_body, e_mail_sender, [e_mail_receiver,])
+        tranfer_staff_email = request.user.email
+
+        send_mail(e_mail_subject, e_mail_body, e_mail_sender, [e_mail_receiver, tranfer_staff_email,])
 
         return HttpResponse(response_data, content_type="application/json")
 

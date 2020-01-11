@@ -6,7 +6,7 @@ from courriers_app.models import *
 from forms import *
 from django.http import HttpResponse
 import json
-from django.db.models import F, Count, Func, Sum
+from django.db.models import F, Count, Func, Sum, Q
 import datetime
 from django.core import serializers
 import unicodedata
@@ -366,18 +366,27 @@ def search_mail(request):
         json_data = json.loads(request.body)
         mail_id = json_data['mail_id']
         mail_id = mail_id.strip()
-        concerned_mail = Mail.objects.filter(number = mail_id)
+        concerned_mail = Mail.objects.filter(~Q(track = None), number__contains = mail_id)
         if(len(concerned_mail) > 0):
-            concerned_mail = concerned_mail[0]
-            sender = concerned_mail.sender
-            received_time = concerned_mail.received_time
-            mail_history = (
-                Track.objects.filter(mail = concerned_mail)
-                .annotate(received_date=F('mail__received_time'))
-                .annotate(staff_f_name=F('staff__first_name'))
-                .annotate(staff_l_name=F('staff__last_name'))
-                .annotate(staff_section=F('staff__section__designation'))
+            first = True
+            for one_mail in concerned_mail:
+                sender = one_mail.sender
+                received_time = one_mail.received_time
+                one_mail_history = (
+                    Track.objects.filter(mail = one_mail).order_by('start_date')
+                    .annotate(received_date=F('mail__received_time'))
+                    .annotate(internal_number=F('mail__number'))
+                    .annotate(external_number=F('mail__external_number'))
+                    .annotate(staff_f_name=F('staff__first_name'))
+                    .annotate(staff_l_name=F('staff__last_name'))
+                    .annotate(staff_section=F('staff__section__designation'))
                 )
+                #one_mail_history = mail_history.values()
+                if first == True:
+                    mail_history = one_mail_history
+                    first = False
+                else:
+                    mail_history = mail_history | one_mail_history
             mail_history = mail_history.values()
         else:
             mail_history = "N"

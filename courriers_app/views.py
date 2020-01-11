@@ -250,9 +250,10 @@ def transfer_mail(request):
 
 def transfer_mail_1(request):
     d = {}
+    the_connected_user = request.user
     d["senders"] = Sender.objects.all()
     d["staff"] = Staff.objects.all().annotate(section_name = F('section__designation'))
-    d["transfers"] = (Track.objects.filter(end_date__isnull = True)
+    d["transfers"] = (Track.objects.filter(end_date__isnull = True, staff__user = the_connected_user)
         .annotate(sender_f_name = F('mail__sender__first_name'))
         .annotate(sender_l_name = F('mail__sender__last_name'))
         .annotate(mail_number = F('mail__number'))

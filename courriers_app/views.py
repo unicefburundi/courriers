@@ -65,8 +65,7 @@ def new_mail_1(request):
     d["pagetitle"] = "New mails"
     d["mail_types"] = MailType.objects.all()
     d["senders"] = Sender.objects.all()
-    d["mails"] = Mail.objects.all()
-    d["mails"] = (Mail.objects.all()
+    d["mails"] = (Mail.objects.filter(track = None)
         .annotate(sender_f_name = F('sender__first_name'))
         .annotate(sender_l_name = F('sender__last_name'))
         .annotate(mail_type_name = F('mail_type__mail_type_name'))

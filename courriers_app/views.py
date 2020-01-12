@@ -136,6 +136,7 @@ def stat_not_closed_mails(request):
     not_closed_pie_data_2 = (Track.objects.select_related()
         .filter(end_date__isnull=True, mail__closed = "False")
         .annotate(received_date=F('mail__received_time'))
+        .annotate(need_answer=F('mail__need_answer'))
         .annotate(staff_f_name=F('staff__first_name'))
         .annotate(staff_l_name=F('staff__last_name'))
         .annotate(staff_section=F('staff__section__designation'))
@@ -152,6 +153,14 @@ def stat_not_closed_mails(request):
         .values('staff__id', 'staff__first_name', 'staff__last_name', 'staff__section__designation')
         .annotate(number_of_mails_for_one_staff=Count('staff__first_name')))
     d["not_closed_pie_data_3"] = not_closed_pie_data_3
+
+    not_closed_mails = (Mail.objects.filter(closed = False)
+        .annotate(sender_f_name = F('sender__first_name'))
+        .annotate(sender_l_name = F('sender__last_name'))
+        .annotate(mail_type_name = F('mail_type__mail_type_name'))
+        ).values()
+    d['not_closed_mails'] = json.dumps(list(not_closed_mails), default=date_handler)
+
 
     return render(request, 'stat_not_closed_mails.html', d)
 
@@ -190,7 +199,7 @@ def save_mail_1(request):
         mail_type = json_data['mail_type']
         sender = json_data['sender']
         mail_number = json_data['mail_number']
-        answer_is_needed = json_data['answerNeeded']
+        answer_needed = json_data['answerNeeded']
         external_mail_number = json_data['external_mail_number']
         datetimepicked = json_data['datetimepicked']
         date_time_picked = datetime.datetime.strptime(datetimepicked, '%m/%d/%Y %I:%M %p')
@@ -201,10 +210,7 @@ def save_mail_1(request):
             )
         soft_copy_fake_url = soft_copy_fake_url.split("\\")
         soft_copy = soft_copy_fake_url[2]'''
-        if answer_is_needed:
-            answer_needed = True
-        else:
-            answer_needed = False
+
 
         mail_type_object = MailType.objects.filter(id=mail_type)
         sender_object = Sender.objects.filter(id=sender)

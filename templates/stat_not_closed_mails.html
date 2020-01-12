@@ -13,6 +13,7 @@
 			displayPieChart1();
 			displayPieChart2();
 			displayPieChart3();
+			displayAllMails();
 		});
 
 
@@ -36,7 +37,7 @@
 	        {% endfor %}
 
 	        var number_of_not_completed_mails = "{{ number_of_not_completed_mails }}";
-	        var chart_title = "<b> Not Completed Mails </b> - <i> Total : </i>"+number_of_not_completed_mails
+	        var chart_title = "<b> Mails still under processing </b> - <i> Total : </i>"+number_of_not_completed_mails
 
 	        Highcharts.chart('pie_chart_for_not_closed', {
 							        chart: {
@@ -101,7 +102,7 @@
 	        {% endfor %}
 
 	        var number_of_not_completed_mails = "{{ number_of_not_completed_mails }}";
-	        var chart_title = "<b> Not Completed Mails </b> - <i> Total : </i>"+number_of_not_completed_mails
+	        var chart_title = "<b> Mails still under processing </b> - <i> Total : </i>"+number_of_not_completed_mails
 
 	        Highcharts.chart('pie_chart_2', {
 							        chart: {
@@ -203,6 +204,91 @@
 
 		}
 
+
+		function displayAllMails(){
+			$('#details_table').empty();
+
+			$('#details_table').append('<p align="center"><b>{% trans "MAILS STILL UNDER PROCESSING" %}</b></p>' +
+
+												'<div style="clear:both; height:10px;"></div>' +
+
+												'<table style="width:100%;" id="d_tbl" class="table table-striped table-bordered table-condensed">');
+
+			$('#d_tbl').append('<thead>' +
+                    '<th align="center">{% trans "Internal Number" %}</th><th align="center">{% trans "External Number" %}</th><th>{% trans "Sender" %}</th><th>{% trans "Mail Type" %}</th><th>{% trans "Record date" %}</th><th>{% trans "Need Answer" %}</th>' +
+                  '</thead>' +
+                    
+                  '<tbody>' +
+                    
+                  '</tbody>');
+
+			not_closed_mails = JSON.parse("{{not_closed_mails}}".replace(/\\n/g, "\\n")
+                    .replace(/\\'/g, "\\'")
+                    .replace(/\\\\/g, "\\\\")
+                    .replace(/\\:/g, '\\:')
+                    .replace(/\\"/g, '\\"')
+                    .replace(/\\&/g, "\\&")
+                    .replace(/\\r/g, "\\r")
+                    .replace(/\\t/g, "\\t")
+                    .replace(/\\b/g, "\\b")
+                    .replace(/\\f/g, "\\f")
+                    .replace(/[\u0000-\u0019]+/g,"")
+                    .replace(/&quot;/g,'"'));
+			
+			records = { json: not_closed_mails };
+
+      
+                  var i;
+                  var sender;
+                  var mail_type;
+                  var record_date;
+
+                  
+                  for (i = 0; i < records.json.length; i++){
+
+                  number = records.json[i]["number"];
+                  external_number = records.json[i]["external_number"];
+                  sender = records.json[i]["sender_f_name"];
+                  mail_type = records.json[i]["mail_type_name"];
+                  record_date = records.json[i]["received_time"];
+                  record_date = record_date.substring(0,19);
+                  var need_answer = records.json[i]["need_answer"];
+                  console.log("===");
+                  console.log(need_answer);
+                  console.log(typeof(need_answer));
+                  if(need_answer === true){
+                  	need_answer = "Yes"
+                  }else{
+                  	need_answer = "No"
+                  }
+
+                  $('#d_tbl').find('tbody').append('<tr style="cursor:pointer;"></tr>');
+
+                    $('#d_tbl tr:last').append('<td align="center">' + number +'</td>');
+                    $('#d_tbl tr:last').append('<td align="center">' + external_number +'</td>');
+                    $('#d_tbl tr:last').append('<td align="center">' + sender +'</td>');
+                    $('#d_tbl tr:last').append('<td align="center">'+ mail_type +'</a></td>');
+                    $('#d_tbl tr:last').append('<td align="center">'+ record_date +'</a></td>');
+                    $('#d_tbl tr:last').append('<td align="center">'+ need_answer +'</a></td>');
+                  }
+
+                  $('#d_tbl').DataTable({
+                    dom: "<'row'<'col-sm-3'l><'col-sm-4'i><'col-sm-5'f>>" +
+                      "<'row'<'col-sm-12'tr>>" +
+                      "<'row'<'col-sm-4'B><'col-sm-8'p>>",
+                    pagingType: "full_numbers",
+                    lengthMenu: [
+                            [10, 25, 50, 100, -1 ],
+                            ['10', '25', '50', '100', 'All' ]
+                        ],
+                        buttons: [
+                            'copy', 'csv', 'excel', 'pdf', 'print'
+                        ]
+                  });
+
+		}
+
+
 	</script>
 
 
@@ -215,6 +301,7 @@
 	    <li class="active"><a data-toggle="tab" href="#time">Time</a></li>
 	    <li><a data-toggle="tab" href="#sections">Sections</a></li>
 	    <li><a data-toggle="tab" href="#staffs">Staffs</a></li>
+	    <li><a data-toggle="tab" href="#details">Details</a></li>
   	</ul>
 
 <div class="well col-sm-12 tab-content">
@@ -255,6 +342,21 @@
 		</div>
 
 		<div id="staff_table" class="well col-sm-10">
+			
+		</div>
+
+		<div class="col-sm-1">
+			
+		</div>
+	</div>
+
+
+	<div id="details" class="tab-pane fade">
+		<div class="col-sm-1">
+			
+		</div>
+
+		<div id="details_table" class="well col-sm-10">
 			
 		</div>
 

@@ -144,17 +144,7 @@
         return;
       }
 
-      /*if ($('#softCopy').val() != ""){
-        softCopy = $('#softCopy').val();
-      }else{
-        softCopy = null;
-      }*/
-
-      if ($('#answerNeeded').val() != ""){
-        answerNeeded = $('#answerNeeded').val();
-      }else{
-        return;
-      }
+      answerNeeded = $('#answerNeeded').is(':checked');
 
       ajaxurl = 'save_mail_1';
       //data = JSON.stringify({ 'mail_type': mail_type, 'sender': sender, 'mail_number': mail_number, 'external_mail_number': external_mail_number, 'datetimepicked': datetimepicked, 'softCopy': softCopy, 'answerNeeded': answerNeeded});
@@ -192,6 +182,7 @@
                 },
                 error: function (jqXHR, exception) {
                     console.log("Error");
+                    console.log(jqXHR);
                 }
             })
     }

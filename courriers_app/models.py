@@ -38,14 +38,14 @@ class Staff(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True)
     first_name = models.CharField(max_length=50, null=True)
     last_name = models.CharField(max_length=50, null=True)
-    section = models.ForeignKey(Section)
-    function = models.ForeignKey(StaffPosition)
+    section = models.ForeignKey(Section, null=True)
+    function = models.ForeignKey(StaffPosition, null=True)
     #email = models.EmailField(max_length=100)
-    office_phone_number = models.CharField(max_length=20)
-    mobile_phone_number = models.CharField(max_length=20)
+    office_phone_number = models.CharField(max_length=20, null=True)
+    mobile_phone_number = models.CharField(max_length=20, null=True)
 
     def __unicode__(self):
-        return "{0} {1}".format(self.first_name, self.last_name)
+        return "{0} {1} - {2}".format(self.first_name, self.last_name, self.user.email)
 
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
@@ -54,7 +54,9 @@ def create_user_profile(sender, instance, created, **kwargs):
 
 @receiver(post_save, sender=User)
 def save_user_profile(sender, instance, **kwargs):
+    print("A")
     instance.staff.save()
+    print("B")
 
 class MailType(models.Model):
     '''In this model, we will store mail types'''

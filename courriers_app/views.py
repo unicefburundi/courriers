@@ -195,7 +195,10 @@ def save_mail_1(request):
     response_data = {}
     if request.method == 'POST':
         #import pdb; pdb.set_trace()
-        json_data = json.loads(request.body)
+        #json_data = json.loads(request.body)
+        json_data = json.loads(request.POST['json_data'])
+        #soft_copy = request.POST['soft_copy']
+
         mail_type = json_data['mail_type']
         sender = json_data['sender']
         mail_number = json_data['mail_number']
@@ -203,7 +206,7 @@ def save_mail_1(request):
         external_mail_number = json_data['external_mail_number']
         datetimepicked = json_data['datetimepicked']
         date_time_picked = datetime.datetime.strptime(datetimepicked, '%m/%d/%Y %I:%M %p')
-        #soft_copy_fake_url = json_data['softCopy']
+
         '''soft_copy_fake_url = (
             unicodedata.normalize('NFKD', soft_copy_fake_url)
             .encode('ascii','ignore')

@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'courriers_app',
     'django_bootstrap_base_template',
+    'import_export',
 ]
 
 MIDDLEWARE = [

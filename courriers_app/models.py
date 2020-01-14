@@ -11,9 +11,9 @@ from django.dispatch import receiver
 class Sender(models.Model):
     '''In this model, we will store providers'''
     first_name = models.CharField(max_length=50)
-    last_name = models.CharField(max_length=50)
-    email = models.EmailField(max_length=100,blank=True)
-    phone_number = models.CharField(max_length=50)
+    last_name = models.CharField(max_length=50, null=True)
+    email = models.EmailField(max_length=100,blank=True, null=True)
+    phone_number = models.CharField(max_length=50, null=True)
 
     def __unicode__(self):
         return "{0} - Tel : {1}".format(self.first_name, self.phone_number)

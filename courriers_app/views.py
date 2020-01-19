@@ -12,6 +12,9 @@ from django.core import serializers
 import unicodedata
 from django.core.mail import send_mail
 
+from django.core.files.storage import FileSystemStorage
+
+
 
 class DiffDays(Func):
     function = 'DATE_PART'
@@ -57,11 +60,83 @@ def new_mail(request):
 
 
 def new_mail_1(request):
+    d = {}
+    message_to_user = ""
     if request.method == 'POST':
         mail_type = request.POST.get('mail_type')
         sender = request.POST.get('sender')
+        external_number = request.POST.get('external_mail_number')
+        internal_number = request.POST.get('mail_number')
+        reception_date_time = request.POST.get('date_time_picked')
+        answer_needed = request.POST.get('answer_needed')
+        soft_copy = request.FILES['soft_copy'] if 'soft_copy' in request.FILES else False
 
-    d = {}
+        if not reception_date_time:
+            message_to_user = "Error. You have not selected the reception date and time"
+            d["pagetitle"] = "New mails"
+            d["mail_types"] = MailType.objects.all()
+            d["senders"] = Sender.objects.all()
+            d["mails"] = (Mail.objects.filter(track = None)
+                .annotate(sender_f_name = F('sender__first_name'))
+                .annotate(sender_l_name = F('sender__last_name'))
+                .annotate(mail_type_name = F('mail_type__mail_type_name'))
+                )
+            d["mails"] = d["mails"].values()
+            d["mails"] = json.dumps(list(d["mails"]), default=date_handler)
+            d["message_to_user"] = message_to_user
+            return render(request, 'new_mail_1.html', d)
+
+        reception_date_time = unicodedata.normalize('NFKD', reception_date_time).encode('ascii','ignore')
+        reception_date_time = datetime.datetime.strptime(reception_date_time, '%m/%d/%Y %I:%M %p')
+
+        if answer_needed is None:
+            the_answer_is_needed = False
+        else:
+            the_answer_is_needed = True
+
+
+        mail_type_object = MailType.objects.filter(id=mail_type)
+        sender_object = Sender.objects.filter(id=sender)
+
+        if len(mail_type_object) > 0:
+            mail_type_object = mail_type_object[0]
+        if len(sender_object) > 0:
+            sender_object = sender_object[0]
+
+        existing_mail = Mail.objects.filter(number = internal_number)
+        if len(existing_mail) > 0:
+            message_to_user = "Error. A mail with number '"+internal_number+"' already exists. Use an other number"
+            d["pagetitle"] = "New mails"
+            d["mail_types"] = MailType.objects.all()
+            d["senders"] = Sender.objects.all()
+            d["mails"] = (Mail.objects.filter(track = None)
+                .annotate(sender_f_name = F('sender__first_name'))
+                .annotate(sender_l_name = F('sender__last_name'))
+                .annotate(mail_type_name = F('mail_type__mail_type_name'))
+                )
+            d["mails"] = d["mails"].values()
+            d["mails"] = json.dumps(list(d["mails"]), default=date_handler)
+            d["message_to_user"] = message_to_user
+            return render(request, 'new_mail_1.html', d)
+        else:
+            if soft_copy:
+                Mail.objects.create(
+                    external_number = external_number, 
+                    number = internal_number, sender = sender_object, 
+                    mail_type = mail_type_object, 
+                    need_answer = the_answer_is_needed, 
+                    received_time = reception_date_time, 
+                    soft_copy = soft_copy
+                    )
+            else:
+                Mail.objects.create(
+                    external_number = external_number, 
+                    number = internal_number, sender = sender_object, 
+                    mail_type = mail_type_object, 
+                    need_answer = the_answer_is_needed, 
+                    received_time = reception_date_time, 
+                    )
+
     d["pagetitle"] = "New mails"
     d["mail_types"] = MailType.objects.all()
     d["senders"] = Sender.objects.all()
@@ -72,7 +147,10 @@ def new_mail_1(request):
         )
     d["mails"] = d["mails"].values()
     d["mails"] = json.dumps(list(d["mails"]), default=date_handler)
+    d["message_to_user"] = message_to_user
     return render(request, 'new_mail_1.html', d)
+
+
 
 def close_mail_view(request):
     d = {}
@@ -191,13 +269,14 @@ def save_mail(request):
 
         return HttpResponse(response_data, content_type="application/json")
 
+
 def save_mail_1(request):
     response_data = {}
     if request.method == 'POST':
         #import pdb; pdb.set_trace()
         #json_data = json.loads(request.body)
         json_data = json.loads(request.POST['json_data'])
-        #soft_copy = request.POST['soft_copy']
+        soft_copy = request.POST['soft_copy']
 
         mail_type = json_data['mail_type']
         sender = json_data['sender']
@@ -207,12 +286,12 @@ def save_mail_1(request):
         datetimepicked = json_data['datetimepicked']
         date_time_picked = datetime.datetime.strptime(datetimepicked, '%m/%d/%Y %I:%M %p')
 
-        '''soft_copy_fake_url = (
+        soft_copy_fake_url = (
             unicodedata.normalize('NFKD', soft_copy_fake_url)
             .encode('ascii','ignore')
             )
         soft_copy_fake_url = soft_copy_fake_url.split("\\")
-        soft_copy = soft_copy_fake_url[2]'''
+        soft_copy = soft_copy_fake_url[2]
 
 
         mail_type_object = MailType.objects.filter(id=mail_type)

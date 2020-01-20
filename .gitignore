@@ -18,3 +18,4 @@ fixtures/
 *.json
 *.sql
 static/
+media/

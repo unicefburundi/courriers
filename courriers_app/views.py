@@ -337,6 +337,89 @@ def transfer_mail(request):
 
 def transfer_mail_1(request):
     d = {}
+    if request.method == 'POST':
+        sender = request.POST.get('sender')
+        mail = request.POST.get('mail')
+        staff = request.POST.get('staff')
+        hard_copy_transfer_date = request.POST.get('hard_copy_transfer_date')
+        comments = request.POST.get('comments')
+        soft_copy = request.FILES['soft_copy'] if 'soft_copy' in request.FILES else False
+
+        #If datetime about when a soft copy has been uploaded is not available, we consider 
+        #the current datetime
+        if hard_copy_transfer_date:
+            hard_copy_transfer_date = datetime.datetime.strptime(datetimepicked, '%m/%d/%Y %I:%M %p')
+        else:
+            hard_copy_transfer_date = datetime.datetime.now()
+
+        sender_record = Sender.objects.filter(id=sender)
+        mail_record = Mail.objects.filter(number=mail)
+        staff_record = Staff.objects.filter(id=staff)
+
+        if len(sender_record) > 0:
+            sender_record = sender_record[0]
+        if len(mail_record) > 0:
+            mail_record = mail_record[0]
+        if len(staff_record) > 0:
+            staff_record = staff_record[0]
+
+        mail_related_track_records = Track.objects.filter(mail = mail_record)
+        last = mail_related_track_records[len(mail_related_track_records) - 1] if mail_related_track_records else None
+        if last is not None:
+            last.end_date = hard_copy_transfer_date
+            last.save()
+        else:
+            pass
+
+        #If a soft copy is not uploaded, we consider the last related soft copy if it is available
+        soft_copy_available = False
+        if not soft_copy:
+            last_mails_record_with_soft_copy = Track.objects.filter(mail = mail_record, soft_copy__isnull = False).order_by("-id")
+            if(len(last_mails_record_with_soft_copy) < 1):
+                last_mails_record_with_soft_copy = Mail.objects.filter(number = mail, soft_copy__isnull = False)
+
+            if(len(last_mails_record_with_soft_copy) > 0):
+                soft_copy_available = True
+                soft_copy = last_mails_record_with_soft_copy[0].soft_copy
+        else:
+            soft_copy_available = True
+
+
+        if soft_copy_available:
+            Track.objects.create(
+                mail = mail_record,
+                staff = staff_record,
+                hard_copy_transfer_time = hard_copy_transfer_date,
+                purpose = comments,
+                soft_copy = soft_copy
+                )
+        else:
+            Track.objects.create(
+                mail = mail_record, 
+                staff = staff_record, 
+                hard_copy_transfer_time = hard_copy_transfer_date, 
+                purpose = comments
+                )
+
+        mail_external_number = mail_record.external_number
+        mail_internal_number = mail_record.number
+
+        e_mail_body = ("Dear "+staff_record.first_name+", "+
+            "a mail with "+mail_external_number+" as external number "+
+            "and "+mail_internal_number+" as internal number "+
+            "has been sent to you for processing. "+
+            "Best regards.")
+
+        e_mail_subject = "Push and Track - A mail has been sent to you for processing"
+
+        e_mail_sender = "noreply@pushandtrack.org"
+
+        e_mail_receiver = staff_record.user.email
+
+        tranfer_staff_email = request.user.email
+
+        send_mail(e_mail_subject, e_mail_body, e_mail_sender, [e_mail_receiver, tranfer_staff_email,])
+
     the_connected_user = request.user
     d["senders"] = Sender.objects.all()
     d["staff"] = Staff.objects.all().annotate(section_name = F('section__designation'))

@@ -91,6 +91,7 @@ class Track(models.Model):
     hard_copy_transfer_time = models.DateTimeField(null=True)
     purpose = models.CharField(max_length=100)
     end_date = models.DateTimeField(blank=True, null=True)
+    soft_copy = models.FileField(upload_to ='uploads/', null=True)
 
     def __unicode__(self):
         return "{0} [Registered {1}] - {2} - Start {3} - End {4}".format(self.mail.sender.first_name, self.mail.received_time, self.staff.first_name, self.start_date, self.end_date)

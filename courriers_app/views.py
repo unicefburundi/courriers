@@ -75,7 +75,7 @@ def new_mail_1(request):
             message_to_user = "Error. You have not selected the reception date and time"
             d["pagetitle"] = "New mails"
             d["mail_types"] = MailType.objects.all()
-            d["senders"] = Sender.objects.all()
+            d["senders"] = Sender.objects.all().order_by("first_name")
             d["mails"] = (Mail.objects.filter(track = None)
                 .annotate(sender_f_name = F('sender__first_name'))
                 .annotate(sender_l_name = F('sender__last_name'))
@@ -108,7 +108,7 @@ def new_mail_1(request):
             message_to_user = "Error. A mail with number '"+internal_number+"' already exists. Use an other number"
             d["pagetitle"] = "New mails"
             d["mail_types"] = MailType.objects.all()
-            d["senders"] = Sender.objects.all()
+            d["senders"] = Sender.objects.all().order_by("first_name")
             d["mails"] = (Mail.objects.filter(track = None)
                 .annotate(sender_f_name = F('sender__first_name'))
                 .annotate(sender_l_name = F('sender__last_name'))
@@ -139,7 +139,7 @@ def new_mail_1(request):
 
     d["pagetitle"] = "New mails"
     d["mail_types"] = MailType.objects.all()
-    d["senders"] = Sender.objects.all()
+    d["senders"] = Sender.objects.all().order_by("first_name")
     d["mails"] = (Mail.objects.filter(track = None)
         .annotate(sender_f_name = F('sender__first_name'))
         .annotate(sender_l_name = F('sender__last_name'))
@@ -154,7 +154,7 @@ def new_mail_1(request):
 
 def close_mail_view(request):
     d = {}
-    d["senders"] = Sender.objects.all()
+    d["senders"] = Sender.objects.all().order_by("first_name")
     d["unclosed_mails"] = Mail.objects.filter(closed = False)
     d["closed_mails"] = Mail.objects.filter(closed = True)
     return render(request, 'close.html', d)
@@ -348,7 +348,7 @@ def transfer_mail_1(request):
         #If datetime about when a soft copy has been uploaded is not available, we consider 
         #the current datetime
         if hard_copy_transfer_date:
-            hard_copy_transfer_date = datetime.datetime.strptime(datetimepicked, '%m/%d/%Y %I:%M %p')
+            hard_copy_transfer_date = datetime.datetime.strptime(hard_copy_transfer_date, '%m/%d/%Y %I:%M %p')
         else:
             hard_copy_transfer_date = datetime.datetime.now()
 
@@ -421,8 +421,8 @@ def transfer_mail_1(request):
         send_mail(e_mail_subject, e_mail_body, e_mail_sender, [e_mail_receiver, tranfer_staff_email,])
 
     the_connected_user = request.user
-    d["senders"] = Sender.objects.all()
-    d["staff"] = Staff.objects.all().annotate(section_name = F('section__designation'))
+    d["senders"] = Sender.objects.all().order_by("first_name")
+    d["staff"] = Staff.objects.all().annotate(section_name = F('section__designation')).order_by("section_name")
     d["transfers"] = (Track.objects.filter(end_date__isnull = True, staff__user = the_connected_user)
         .annotate(sender_f_name = F('mail__sender__first_name'))
         .annotate(sender_l_name = F('mail__sender__last_name'))

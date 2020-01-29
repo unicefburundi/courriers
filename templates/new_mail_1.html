@@ -1,4 +1,4 @@
-{% extends "base_1.html" %}
+{% extends "base.html" %}
 {% load staticfiles %}
 {% load i18n %}
 {% load static %}
@@ -257,77 +257,166 @@
 
     <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
-    <div class="container">
-        <div class="row">
-            <div class="form-group">
-              <label for="mail_type">{% trans "Mail Type:" %}</label>
+    <div>
+        
+            <div class="row">
+
+              <div class="col-20">
+              </div>
+
+              <div class="col-40">
+                <label for="mail_type">{% trans "Mail Type:" %}</label>
+              </div>
+
+              <div class="col-40">
               <select id="mail_type" class="form-control" style="width:140px"  required="required" name="mail_type">
                 <option value="" selected="selected">[ {% trans "Select mail type" %} ]</option>
               </select>
+              </div>
+
+              <div class="col-20">
+              </div>
+
             </div>
             
-            <div class="form-group">
-              <label for="sender">{% trans "Sender:" %}</label>
-              <select id="sender" class="form-control" style="width:140px"  required="required" name="sender">
-                <option value="" selected="selected">[ {% trans "Select the sender" %} ]</option>
-              </select>
-            </div>
+            <div class="row">
 
-            <div class="form-group">
-              <label for="external_mail_number">{% trans "External Number:" %}</label>
-              <input type="text" class="form-control" style="width:140px" id="external_mail_number" required="required" name="external_mail_number">
-            </div>
-        </div>
-
-        <br>
-        <br>
-
-        <div class="row">
-            <div class="form-group">
-              <label for="mail_number">{% trans "Internal Number:" %}</label>
-              <input type="text" class="form-control" style="width:140px" id="mail_number" required="required" name="mail_number">
-            </div>
-        
-
-        
-            <div class="form-group">
-              <label for="datetimepicker">{% trans "Reception Date and Time:" %}</label>
-              <div class='input-group date'>
-                <input type='text' class="form-control" id='datetimepicker' name="date_time_picked"/>
-                <span class="input-group-addon">
-                    <span class="glyphicon glyphicon-calendar"></span>
-                </span>
+              <div class="col-20">
               </div>
+
+              <div class="col-40">
+                <label for="sender">{% trans "Sender:" %}</label>
+              </div>
+
+              <div class="col-40">
+                <select id="sender" class="form-control" style="width:140px"  required="required" name="sender">
+                  <option value="" selected="selected">[ {% trans "Select the sender" %} ]</option>
+                </select>
+              </div>
+
+              <div class="col-20">
+              </div>
+
             </div>
-        </div>
 
-        <br>
-        <br>
 
-        <div class="row">
-            <div class="custom-file form-group">
-              <label class="custom-file-label" for="softCopy">Soft Copy</label>
+            <div class="row">
+
+              <div class="col-20">
+              </div>
+
+              <div class="col-40">
+                <label for="external_mail_number">{% trans "External Number:" %}</label>
+              </div>
+
+              <div class="col-40">
+                <input type="text" class="form-control" style="width:140px" id="external_mail_number" required="required" name="external_mail_number">
+              </div>
+
+              <div class="col-20">
+              </div>
+
+            </div>
+        
+
+
+            <div class="row">
+
+              <div class="col-20">
+              </div>
+
+              <div class="col-40">
+                <label for="mail_number">{% trans "Internal Number:" %}</label>
+              </div>
+
+              <div class="col-40">
+                <input type="text" class="form-control" style="width:140px" id="mail_number" required="required" name="mail_number">
+              </div>
+
+              <div class="col-20">
+              </div>
+
+            </div>
+        
+        
+            <div class="row">
+
+              <div class="col-20">
+              </div>
+
+              <div class="col-40">
+                <label for="datetimepicker">{% trans "Reception Date and Time:" %}</label>
+              </div>
+
+              <div class="col-40">
+                <div class='input-group date'>
+                  <input type='text' class="form-control" id='datetimepicker' name="date_time_picked"/>
+                  <span class="input-group-addon">
+                      <span class="glyphicon glyphicon-calendar"></span>
+                  </span>
+                </div>
+              </div>
+
+              <div class="col-20">
+              </div>
+
+            </div>
+
+
+
+            <div class="row">
+
+              <div class="col-20">
+              </div>
+
+              <div class="col-40">
+                <label class="custom-file-label" for="softCopy">Soft Copy</label>
+              </div>
+
+              <div class="col-40">
+                <input type="file" class="custom-file-input" id="softCopy" name="soft_copy">
+              </div>
+
+              <div class="col-20">
+              </div>
+
+            </div>
+
+            <div class="row">
+
+              <div class="col-20">
+              </div>
+
+              <div class="col-40">
+                <label class="custom-control-label" for="answerNeeded">Answer Needed</label>
+              </div>
+
+              <div class="col-40">
+                <input type="checkbox" class="custom-control-input" id="answerNeeded" name="answer_needed">
+              </div>
+
+              <div class="col-20">
+              </div>
+
+            </div>
+
+
+
+            <div class="row">
+
+              <div class="col-45">
               
-              <input type="file" class="custom-file-input" id="softCopy" name="soft_copy">
+              </div>
+
+              <div class="col-10">
+                <button type="submit">Save</button>
+              </div>
+
+              <div class="col-45">
+              
+              </div>
+
             </div>
-        </div>
-
-        <br>
-        <br>
-
-        <div class="row">
-            <div class="form-group custom-control custom-checkbox">
-              <label class="custom-control-label" for="answerNeeded">Answer Needed</label>
-              <input type="checkbox" class="custom-control-input" id="answerNeeded" name="answer_needed">
-            </div>
-        </div>
-
-        <br>
-        <br>    
-
-        <div class="row">
-            <button type="submit">Save</button>
-        </div>
 
         <div class="row">
         <h1><font color="red">{{message_to_user}}</font></h1>

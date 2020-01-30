@@ -19,7 +19,7 @@
 			}
 			if ("{{ staff }}") {
 				{% for s in staff %}
-					$('#staff').append('<option value="{{ s.id }}">{{ s.first_name }} {{ s.last_name }} - {{ s.section_name }}</option>');
+					$('#staff').append('<option value="{{ s.id }}">{{ s.section_name }} - {{ s.first_name }} {{ s.last_name }}</option>');
 				{% endfor %}
 			}
 

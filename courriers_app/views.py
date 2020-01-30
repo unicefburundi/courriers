@@ -151,6 +151,30 @@ def new_mail_1(request):
     return render(request, 'new_mail_1.html', d)
 
 
+def partners(request):
+    d = {}
+    message_to_user = ""
+    if request.method == 'POST':
+        first_mame = request.POST.get('first_mame')
+        last_name = request.POST.get('last_name')
+        first_mame = unicodedata.normalize('NFKD', first_mame).encode('ascii','ignore')
+        last_name = unicodedata.normalize('NFKD', last_name).encode('ascii','ignore')
+        if(len(first_mame) < 1):
+            message_to_user = "Error. First Name field can not be empty"
+            senders = Sender.objects.all().order_by("first_name").values()
+            d["senders"] = json.dumps(list(senders), default=date_handler)
+            return render(request, 'partners.html', d)
+        else:
+            first_mame = first_mame.upper()
+
+        if(len(last_name) > 0):
+            last_name = last_name.upper()
+
+        Sender.objects.create(first_name = first_mame, last_name = last_name)
+    senders = Sender.objects.all().order_by("first_name").values()
+    d["senders"] = json.dumps(list(senders), default=date_handler)
+    d["message_to_user"] = message_to_user
+    return render(request, 'partners.html', d)
 
 def close_mail_view(request):
     d = {}

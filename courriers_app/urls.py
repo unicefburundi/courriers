@@ -6,6 +6,7 @@ urlpatterns = [
     url(r'^home$', views.home, name='home'),
     url(r'^new_mail$', views.new_mail, name='new_mail'),
     url(r'^new_mail_1$', views.new_mail_1, name='new_mail_1'),
+    url(r'^partners$', views.partners, name='partners'),
     url(r'^transfer_mail$', views.transfer_mail, name='transfer_mail'),
     url(r'^transfer_mail_1$', views.transfer_mail_1, name='transfer_mail_1'),
     url(r'^save_mail$', views.save_mail, name='save_mail'),

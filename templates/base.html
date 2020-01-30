@@ -172,7 +172,19 @@
 						<li><b><a role="button" href="{% url 'landing' %} ">{% trans "Home" %}</a></b></li>
 
 						{% if request.user|has_group:"Receptionist" %}
-						<li><b><a role="button" href="{% url 'new_mail_1' %} ">{% trans "New" %}</a></b></li>
+
+						<li role="presentation" class="dropdown">
+							<b><a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+      {% trans "New" %} <span class="caret"></span>
+    						</a></b>
+    						<ul>
+
+								<li><b><a role="button" href="{% url 'new_mail_1' %} ">{% trans "Mail" %}</a></b></li>
+								<li><b><a role="button" href="{% url 'partners' %} ">{% trans "Partner" %}</a></b></li>
+
+							</ul>
+						</li>
+
 						{% endif %}
 
 

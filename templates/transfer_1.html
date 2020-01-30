@@ -1,4 +1,4 @@
-{% extends "base_1.html" %}
+{% extends "base.html" %}
 {% load staticfiles %}
 {% load i18n %}
 {% load static %}
@@ -235,38 +235,82 @@
 
 			<form method="post" enctype="multipart/form-data">
 			{% csrf_token %}
-			<div class="container">
+			<div>
 
 				<div class="row">
-					<div class="form-group">
+
+					<div class="col-20">
+              		</div>
+
+              		<div class="col-40">
 						<label for="sender">{% trans "Sender:" %}</label>
+					</div>
+
+					<div class="col-40">
 						<select id="sender" class="form-control" style="width:140px"  onchange="fetchmails(this.value)" required="required" name="sender">
 							<option value="" selected="selected">[ {% trans "Select the sender" %} ]</option>'
 						</select>
 					</div>
 
-					<div class="form-group">
+					<div class="col-20">
+              		</div>
+
+				</div>
+
+
+				<div class="row">
+
+					<div class="col-20">
+              		</div>
+
+              		<div class="col-40">
 						<label for="mail">{% trans "Mail/Invoice:" %}</label>
+					</div>
+
+					<div class="col-40">
 						<select id="mail" class="form-control" style="width:140px"  onchange="desplay_history(this.value)" required="required" name="mail">
 							<option value="" selected="selected">[ {% trans "Select the sender" %} ]</option>'
 						</select>
 					</div>
 
-					<div class="form-group">
+					<div class="col-20">
+              		</div>
+
+				</div>
+
+
+				<div class="row">
+
+					<div class="col-20">
+              		</div>
+
+              		<div class="col-40">
 						<label for="staff">{% trans "Staff:" %}</label>
+					</div>
+
+					<div class="col-40">
 						<select id="staff" class="form-control" style="width:140px"   required="required" name="staff">
 							<option value="" selected="selected">[ {% trans "Select a staff" %} ]</option>'
 						</select>
 					</div>
 
+					<div class="col-20">
+              		</div>
+
 		        </div>
 
-		        <br>
-		        <br>
+
 
 		        <div class="row">
-		        	<div class="form-group">
+
+		        	<div class="col-20">
+              		</div>
+
+              		<div class="col-40">
 		              <label for="datetimepicker">{% trans "Hard Copy Transfer Date and Time:" %}</label>
+		            </div>
+
+		            <div class="col-40">
 		              <div class='input-group date'>
 		                <input type='text' class="form-control" id='datetimepicker' name="hard_copy_transfer_date"/>
 		                <span class="input-group-addon">
@@ -275,28 +319,66 @@
 		              </div>
 		            </div>
 
-					<div class="form-group">
+		            <div class="col-20">
+              		</div>
+
+		        </div>
+
+
+		        <div class="row">
+
+		        	<div class="col-20">
+              		</div>
+
+              		<div class="col-40">
 						<label for="comments">{% trans "Comments:" %}</label>
+					</div>
+
+					<div class="col-40">
 						<textarea class="form-control" style="width:140px" id="comments" required="required" name="comments"></textarea>
 					</div>
+
+					<div class="col-20">
+              		</div>
+
 				</div>
 
-				<br>
-				<br>
 
-					<div class="row">
-			            <div class="custom-file form-group">
-			              <label class="custom-file-label" for="softCopy">Soft Copy</label>
-			              
-			              <input type="file" class="custom-file-input" id="softCopy" name="soft_copy">
-			            </div>
-			        </div>
-
-				<br>
-				<br>
 
 				<div class="row">
-					<button type="submit">Transfer</button>
+
+					<div class="col-20">
+              		</div>
+
+              		<div class="col-40">
+		            	<label class="custom-file-label" for="softCopy">Soft Copy</label>
+		            </div>
+		              
+		            <div class="col-40">
+		             	<input type="file" class="custom-file-input" id="softCopy" name="soft_copy">
+		            </div>
+
+		            <div class="col-20">
+              		</div>
+
+			    </div>
+
+
+
+				<div class="row">
+
+					<div class="col-45">
+              
+              		</div>
+
+              		<div class="col-10">
+						<button type="submit">Transfer</button>
+					</div>
+
+					<div class="col-45">
+              
+              		</div>
+
 				</div>
 
 			</div>

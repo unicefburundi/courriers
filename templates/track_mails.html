@@ -1,4 +1,4 @@
-{% extends "base2.html" %}
+{% extends "base.html" %}
 {% load staticfiles %}
 {% load i18n %}
 {% load static %}
@@ -134,14 +134,44 @@
 
 			<form method="post" enctype="multipart/form-data">
 			{% csrf_token %}
+			<div>
+				<div class="row">
 
-			<div class="form-group">
-				<label for="mail_id">{% trans "ID :" %}</label>
-				<textarea class="form-control" style="width:140px" id="mail_id" required="required" placeholder="Type here a mail internal number"></textarea>
+					<div class="col-30">
+              		</div>
+
+              		<!--<div class="col-20">
+              		</div>-->
+
+              		<!--<div class="col-40">
+						<label class="custom-file-label" for="mail_id">{% trans "ID :" %}</label>
+					</div>-->
+
+					<div class="col-40">
+						<textarea class="form-control" id="mail_id" style="text-align: center;" required="required" placeholder="Type here a mail internal number"></textarea>
+					</div>
+
+					<!--<div class="col-20">
+              		</div>-->
+
+              		<div class="col-30">
+              		</div>
+
+				</div>
+			
+				<div class="row">
+					<div class="col-30">
+              		</div>
+
+              		<div class="col-40-center">
+						<button type="button" onclick="searchMail()">Search</button>
+					</div>
+
+					<div class="col-30">
+              		</div>
+				</div>
+
 			</div>
-
-			<button type="button" onclick="searchMail()">Search</button>
-
 			</form>
 
 		</div>

@@ -161,6 +161,7 @@ def partners(request):
         last_name = unicodedata.normalize('NFKD', last_name).encode('ascii','ignore')
         if(len(first_mame) < 1):
             message_to_user = "Error. First Name field can not be empty"
+            d["message_to_user"] = message_to_user
             senders = Sender.objects.all().order_by("first_name").values()
             d["senders"] = json.dumps(list(senders), default=date_handler)
             return render(request, 'partners.html', d)

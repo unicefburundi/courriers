@@ -81,7 +81,7 @@ class Mail(models.Model):
     soft_copy = models.FileField(upload_to ='uploads/', null=True)
 
     def __unicode__(self):
-        return "{0} - Mail type : {1} - Registered {2}".format(self.sender.first_name, self.mail_type.mail_type_name, self.received_time)
+        return "{0} - Mail type : {1} - Registered {2} - Isclosed {3}".format(self.sender.first_name, self.mail_type.mail_type_name, self.received_time, self.closed)
 
 class Track(models.Model):
     '''In this model, we will record wherever a mail went through'''

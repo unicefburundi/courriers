@@ -86,7 +86,7 @@
 		
 		Highcharts.chart('pie_chart_for_not_closed', {
 								    chart: {
-								        type: 'bar'
+								        type: 'column'
 								    },
 								    title: {
 								        text: 'Number of mails by processing duration in days'
@@ -109,6 +109,7 @@
 								        }
 								    },
 								    tooltip: {
+								    	enabled: false,
 								        valueSuffix: ' mails'
 								    },
 								    plotOptions: {
@@ -251,7 +252,7 @@
 								            ['10', '25', '50', '100', 'All' ]
 								        ],
 								        buttons: [
-								            'copy', 'csv', 'excel', 'pdf', 'print'
+								            'csv', 'excel', 'pdf', 'print'
 								        ]
 									});
 

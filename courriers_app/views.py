@@ -94,6 +94,10 @@ def new_mail_1(request):
         else:
             the_answer_is_needed = True
 
+        #Let's identify the connected staff
+        the_connected_user = request.user
+        the_connected_staff = Staff.objects.filter(user = the_connected_user)[0]
+
 
         mail_type_object = MailType.objects.filter(id=mail_type)
         sender_object = Sender.objects.filter(id=sender)
@@ -120,7 +124,7 @@ def new_mail_1(request):
             return render(request, 'new_mail_1.html', d)
         else:
             if soft_copy:
-                Mail.objects.create(
+                created_mail = Mail.objects.create(
                     external_number = external_number, 
                     number = internal_number, sender = sender_object, 
                     mail_type = mail_type_object, 
@@ -128,14 +132,27 @@ def new_mail_1(request):
                     received_time = reception_date_time, 
                     soft_copy = soft_copy
                     )
+                Track.objects.create(
+                    mail = created_mail,
+                    staff = the_connected_staff,
+                    hard_copy_transfer_time = reception_date_time,
+                    purpose = "For ventation",
+                    soft_copy = soft_copy
+                )
             else:
-                Mail.objects.create(
+                created_mail = Mail.objects.create(
                     external_number = external_number, 
                     number = internal_number, sender = sender_object, 
                     mail_type = mail_type_object, 
                     need_answer = the_answer_is_needed, 
                     received_time = reception_date_time, 
                     )
+                Track.objects.create(
+                    mail = created_mail,
+                    staff = the_connected_staff,
+                    hard_copy_transfer_time = reception_date_time,
+                    purpose = "For ventation",
+                )
 
     d["pagetitle"] = "New mails"
     d["mail_types"] = MailType.objects.all()
@@ -194,7 +211,7 @@ def mail_details(request, mail_number):
 
     for one_section in one_mail_follow_up_data:
         if one_section["processing_time_in_section"]:
-            one_section["processing_time_in_section"] = int(one_section["processing_time_in_section"].total_seconds()) / 60
+            one_section["processing_time_in_section"] = one_section["processing_time_in_section"].total_seconds()
         else:
             one_section["processing_time_in_section"] = 0
 
@@ -234,7 +251,7 @@ def stat_not_closed_mails(request):
         .values('processing_time')
         .annotate(number_same_time=Count('processing_time')))
     d["number_of_not_completed_mails"] = Mail.objects.filter(closed = "False").count()
-    d["not_closed_pie_data"] = not_closed_pie_data.order_by('-processing_time')
+    d["not_closed_pie_data"] = not_closed_pie_data.order_by('processing_time')
 
     not_closed_pie_data_2 = (Track.objects.select_related()
         .filter(end_date__isnull=True, mail__closed = "False")

@@ -23,6 +23,8 @@
 			$('#pie_chart_for_not_closed').empty();
 
 			var all_pie_data_list = [];
+			var number_of_days_list = [];
+			var number_of_mails_list = [];
 			console.log("{{not_closed_pie_data}}");
 	        {% for one_data_type in not_closed_pie_data %}
 	        	var one_item = {};
@@ -30,17 +32,20 @@
 	        	var y = "{{ one_data_type.number_same_time }}";
 
 
-	        	name = parseInt(name);
-	        	name = name+" days"
-	        	one_item["name"] = name;
+	        	name_1 = parseInt(name);
+	        	name_1 = name_1+" days"
+	        	one_item["name"] = name_1;
 	        	one_item["y"] = parseInt(y);
 	        	all_pie_data_list.push(one_item);
+
+	        	number_of_days_list.push(parseInt(name));
+	        	number_of_mails_list.push(parseInt(y));
 	        {% endfor %}
 
 	        var number_of_not_completed_mails = "{{ number_of_not_completed_mails }}";
 	        var chart_title = "<b> Mails still under processing </b> - <i> Total : </i>"+number_of_not_completed_mails
 
-	        Highcharts.chart('pie_chart_for_not_closed', {
+	        /*Highcharts.chart('pie_chart_for_not_closed', {
 							        chart: {
 							            plotBackgroundColor: null,
 							            plotBorderWidth: null,
@@ -76,7 +81,52 @@
 							        credits: {
 									      enabled: false
 									  },
-							    });
+							    });*/
+
+		
+		Highcharts.chart('pie_chart_for_not_closed', {
+								    chart: {
+								        type: 'bar'
+								    },
+								    title: {
+								        text: 'Number of mails by processing duration in days'
+								    },
+								    xAxis: {
+								        categories: number_of_days_list,
+								        title: {
+								            text: 'Processing Duration (Days)'
+								        }
+								    },
+								    yAxis: {
+								        min: 0,
+								        allowDecimals: false,
+								        title: {
+								            text: 'Number of mails',
+								            align: 'high'
+								        },
+								        labels: {
+								            overflow: 'justify'
+								        }
+								    },
+								    tooltip: {
+								        valueSuffix: ' mails'
+								    },
+								    plotOptions: {
+								        bar: {
+								            dataLabels: {
+								                enabled: true
+								            }
+								        }
+								    },
+								    credits: {
+								        enabled: false
+								    },
+								    series: [{
+								    	showInLegend:false,
+								        data: number_of_mails_list
+								    }]
+								});
+
 
 		}
 
@@ -142,6 +192,8 @@
 									      enabled: false
 									  },
 							    });
+
+			
 
 		}
 

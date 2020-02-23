@@ -234,7 +234,7 @@ def stat_not_closed_mails(request):
         .values('processing_time')
         .annotate(number_same_time=Count('processing_time')))
     d["number_of_not_completed_mails"] = Mail.objects.filter(closed = "False").count()
-    d["not_closed_pie_data"] = not_closed_pie_data
+    d["not_closed_pie_data"] = not_closed_pie_data.order_by('-processing_time')
 
     not_closed_pie_data_2 = (Track.objects.select_related()
         .filter(end_date__isnull=True, mail__closed = "False")

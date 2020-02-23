@@ -10,10 +10,11 @@
 
 
 		$(document).ready(function() {
+			displayAllMails2();
 			displayPieChart1();
 			displayPieChart2();
 			displayPieChart3();
-			displayAllMails();
+			//displayAllMails();
 		});
 
 
@@ -22,7 +23,7 @@
 			$('#pie_chart_for_not_closed').empty();
 
 			var all_pie_data_list = [];
-
+			console.log("{{not_closed_pie_data}}");
 	        {% for one_data_type in not_closed_pie_data %}
 	        	var one_item = {};
 	        	var name = "{{ one_data_type.processing_time }}";
@@ -289,6 +290,87 @@
 		}
 
 
+
+		function displayAllMails2(){
+			$('#details_table_2').empty();
+
+			$('#details_table_2').append('<p align="center"><b>{% trans "MAILS STILL UNDER PROCESSING" %}</b></p>' +
+
+												'<div style="clear:both; height:10px;"></div>' +
+
+												'<table style="width:100%;" id="d_tbl_2" class="table table-striped table-bordered table-condensed">');
+
+			$('#d_tbl_2').append('<thead>' +
+                    '<th align="center">{% trans "Internal Number" %}</th><th align="center">{% trans "Sender" %}</th><th>{% trans "Mail Type" %}</th><th>{% trans "Duration In System (Days)" %}</th><th>{% trans "Current Processing Section" %}</th><th>{% trans "Need Answer" %}</th>' +
+                  '</thead>' +
+                    
+                  '<tbody>' +
+                    
+                  '</tbody>');
+
+			not_closed_mails_2 = JSON.parse("{{not_closed_mails_2}}".replace(/\\n/g, "\\n")
+                    .replace(/\\'/g, "\\'")
+                    .replace(/\\\\/g, "\\\\")
+                    .replace(/\\:/g, '\\:')
+                    .replace(/\\"/g, '\\"')
+                    .replace(/\\&/g, "\\&")
+                    .replace(/\\r/g, "\\r")
+                    .replace(/\\t/g, "\\t")
+                    .replace(/\\b/g, "\\b")
+                    .replace(/\\f/g, "\\f")
+                    .replace(/[\u0000-\u0019]+/g,"")
+                    .replace(/&quot;/g,'"'));
+			
+			records = { json: not_closed_mails_2 };
+
+      
+                  var i;
+
+                  
+                  for (i = 0; i < records.json.length; i++){
+
+                  number = records.json[i]["mail_internal_number"];
+                  sender = records.json[i]["sender_f_name"];
+                  record_date = records.json[i]["recorded_date"];
+                  record_date = record_date.substring(0,19);
+                  mail_type = records.json[i]["mail_type"];
+                  number_of_days_in_system = records.json[i]["number_of_days_in_the_system"];
+                  current_processing_section = records.json[i]["staff_section"];
+                  var need_answer = records.json[i]["need_answer"];
+                  if(need_answer === true){
+                  	need_answer = "Yes"
+                  }else{
+                  	need_answer = "No"
+                  }
+
+                  $('#d_tbl_2').find('tbody').append('<tr style="cursor:pointer;"></tr>');
+
+                    $('#d_tbl_2 tr:last').append('<td align="center">' + number +'</td>');
+                    $('#d_tbl_2 tr:last').append('<td align="center">' + sender +'</td>');
+                    //$('#d_tbl_2 tr:last').append('<td align="center">'+ record_date +'</a></td>');
+                    $('#d_tbl_2 tr:last').append('<td align="center">'+ mail_type +'</a></td>');
+                    $('#d_tbl_2 tr:last').append('<td align="center">'+ number_of_days_in_system +'</a></td>');
+                    $('#d_tbl_2 tr:last').append('<td align="center">'+ current_processing_section +'</a></td>');
+                    $('#d_tbl_2 tr:last').append('<td align="center">'+ need_answer +'</a></td>');
+                  }
+
+                  $('#d_tbl_2').DataTable({
+                    dom: "<'row'<'col-sm-3'l><'col-sm-4'i><'col-sm-5'f>>" +
+                      "<'row'<'col-sm-12'tr>>" +
+                      "<'row'<'col-sm-4'B><'col-sm-8'p>>",
+                    pagingType: "full_numbers",
+                    lengthMenu: [
+                            [10, 25, 50, 100, -1 ],
+                            ['10', '25', '50', '100', 'All' ]
+                        ],
+                        buttons: [
+                            'csv', 'excel', 'pdf', 'print'
+                        ]
+                  });
+
+		}
+
+
 	</script>
 
 
@@ -298,15 +380,31 @@
 
 {% block container %}
 	<ul class="nav nav-tabs">
-	    <li class="active"><a data-toggle="tab" href="#time">Time</a></li>
+		<li class="active"><a data-toggle="tab" href="#details_2">Details</a></li>
+	    <li><a data-toggle="tab" href="#time">Time</a></li>
 	    <li><a data-toggle="tab" href="#sections">Sections</a></li>
 	    <li><a data-toggle="tab" href="#staffs">Staffs</a></li>
-	    <li><a data-toggle="tab" href="#details">Details</a></li>
+	    <!--<li><a data-toggle="tab" href="#details">Details</a></li>-->
   	</ul>
 
 <div class="well col-sm-12 tab-content">
 
-	<div id="time" class="tab-pane fade in active">
+	<div id="details_2" class="tab-pane fade in active">
+		<div class="col-sm-1">
+			
+		</div>
+
+		<div id="details_table_2" class="well col-sm-10">
+			
+		</div>
+
+		<div class="col-sm-1">
+			
+		</div>
+	</div>
+
+
+	<div id="time" class="tab-pane fade">
 		<div class="col-sm-1">
 			
 		</div>

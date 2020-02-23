@@ -265,6 +265,22 @@ def stat_not_closed_mails(request):
     d['not_closed_mails'] = json.dumps(list(not_closed_mails), default=date_handler)
 
 
+    not_closed_mails_2 = (Track.objects.select_related()
+        .filter(end_date__isnull=True, mail__closed = "False")
+        .annotate(mail_internal_number=F('mail__number'))
+        .annotate(mail_type=F('mail__mail_type__mail_type_name'))
+        .annotate(recorded_date=F('mail__received_time'))
+        .annotate(sender_f_name = F('mail__sender__first_name'))
+        .annotate(sender_l_name = F('mail__sender__last_name'))
+        .annotate(need_answer=F('mail__need_answer'))
+        .annotate(staff_f_name=F('staff__first_name'))
+        .annotate(staff_l_name=F('staff__last_name'))
+        .annotate(staff_section=F('staff__section__designation'))
+        .annotate(number_of_days_in_the_system=DiffDays(CastDate(current_date)-CastDate(F('mail__received_time'))) + 1)
+        ).values()
+    d['not_closed_mails_2'] = json.dumps(list(not_closed_mails_2), default=date_handler)
+
+
     return render(request, 'stat_not_closed_mails.html', d)
 
 

@@ -12,11 +12,11 @@
 					$('#sender').append('<option value="{{ s.id }}">{{ s.first_name }} {{s.last_name}}</option>');
 				{% endfor %}
 			}
-			if ("{{ mails }}") {
+			/*if ("{{ mails }}") {
 				{% for m in mails %}
 					$('#mail').append('<option value="{{ m.id }}">{{ m.id }}</option>');
 				{% endfor %}
-			}
+			}*/
 			if ("{{ staff }}") {
 				{% for s in staff %}
 					$('#staff').append('<option value="{{ s.id }}">{{ s.section_name }} - {{ s.first_name }} {{ s.last_name }}</option>');

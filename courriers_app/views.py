@@ -653,13 +653,30 @@ def get_unclosed_mails(request):
         sender = Sender.objects.filter(id=sender_id)
         if len(sender) > 0:
             sender = sender[0]
-            mails = Mail.objects.filter(sender = sender, closed = False)
-            '''response_data["mails"] = mails'''
+            the_connected_user = request.user
+            if(the_connected_user.groups.filter(name__in = ['Receptionist']).exists()):
+                mails = (Track.objects.filter(end_date__isnull = True, 
+                    mail__sender = sender)
+                    .annotate(sender_f_name = F('mail__sender__first_name'))
+                    .annotate(sender_l_name = F('mail__sender__last_name'))
+                    .annotate(number = F('mail__number'))
+                    .annotate(staff_f_name = F('staff__first_name'))
+                    .annotate(staff_l_name = F('staff__last_name'))
+                    .annotate(section = F('staff__section__designation'))
+                    )
+            else:
+                mails = (Track.objects.filter(end_date__isnull = True, 
+                    staff__user = the_connected_user, 
+                    mail__sender = sender)
+                    .annotate(sender_f_name = F('mail__sender__first_name'))
+                    .annotate(sender_l_name = F('mail__sender__last_name'))
+                    .annotate(number = F('mail__number'))
+                    .annotate(staff_f_name = F('staff__first_name'))
+                    .annotate(staff_l_name = F('staff__last_name'))
+                    .annotate(section = F('staff__section__designation'))
+                    )
             mails = mails.values()
             mails = json.dumps(list(mails), default=date_handler)
-            mails = json.loads(mails)
-            mails = json.dumps(mails, default=date_handler)
-
 
     return HttpResponse(mails, content_type="application/json")
 

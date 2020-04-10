@@ -143,7 +143,7 @@
 										</div>
 										<div class="col-sm-10" align="center">
 											<!--<a href="/">-->
-											<span class="brand-app" style="text-align:center;"><font face="times new roman">MAILS & INVOICES</font></span>
+											<span class="brand-app" style="text-align:center;"><font face="times new roman">PUSH & TRACK</font></span>
 											<!--</a>-->
 										</div>
 										
@@ -170,6 +170,8 @@
 			{% block navbar %}
 				<div class="fitcontent" id="nav" style="background-color: #80bbff; height: 10%;">
 					<ul id="menu-main_menu">
+
+						<li><b><a role="button" href="{% url 'binome' %} ">{% trans "Binome" %}</a></b></li>
 					
 						<li><b><a role="button" href="{% url 'landing' %} ">{% trans "Home" %}</a></b></li>
 
@@ -253,7 +255,7 @@
 								<div class="widget">
 									<div class="widget-wrap">
 										<p class="copyright text-muted small" style="text-align: center;">
-											© 2018 - 2020
+											© 2019 - 2020
 												{% trans "Unicef Burundi" %}
 										</p>
 									</div>

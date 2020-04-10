@@ -14,6 +14,10 @@
 				{% endfor %}
 			}
 
+			if ("{{ message_to_user }}"){
+				$('#message_to_user').append('{{message_to_user}}');
+			}
+
 			desplay_records();
 
 		});
@@ -125,21 +129,29 @@
 					<div class="col-30">
               		</div>
 
-              		<!--<div class="col-20">
-              		</div>-->
+					<div class="col-40">
+						<div id = "message_to_user" align="center">
+							
+						</div>
+					</div>
 
-              		<!--<div class="col-40">
-						<label class="custom-file-label" for="mail_id">{% trans "ID :" %}</label>
-					</div>-->
+              		<div class="col-30">
+              		</div>
+
+				</div>
+
+				<br>
+
+				<div class="row">
+
+					<div class="col-30">
+              		</div>
 
 					<div class="col-40">
 						<select id="staff" class="form-control" style="width:140px"   required="required" name="staff">
 							<option value="" selected="selected">[ {% trans "Select a staff" %} ]</option>'
 						</select>
 					</div>
-
-					<!--<div class="col-20">
-              		</div>-->
 
               		<div class="col-30">
               		</div>
@@ -155,7 +167,6 @@
               		</div>
 
               		<div class="col-10">
-						<!--<button type="button" onclick="searchMail()">Save</button>-->
 						<button type="submit">Save</button>
 					</div>
 

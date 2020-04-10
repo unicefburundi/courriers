@@ -24,6 +24,7 @@ def binome(request):
     		.exclude(notavailable__isnull=True)
     		.annotate(section_name = F('section__designation'))
     		.order_by("first_name"))
+        d["message_to_user"] = message_to_user
     	return render(request, 'binomes.html', d)
 
     if request.method == 'POST':
@@ -35,12 +36,21 @@ def binome(request):
     	try:
             NotAvailable.objects.create(staff = the_connected_staff)
     	except:
-            message_to_user = "Sorry. Someone has just choose you. Thank you"
+            message_to_user = "Sorry. You are already connected with someone. Thank you"
             d["staff"] = (Staff.objects.all()
 	    		.exclude(user = the_connected_user)
 	    		.exclude(notavailable__isnull=True)
 	    		.annotate(section_name = F('section__designation'))
 	    		.order_by("first_name"))
+            d["message_to_user"] = message_to_user
+            d["binomes"] = (Binome.objects.all()
+                .annotate(staff_1_f_name = F('staff_1__first_name'))
+                .annotate(staff_1_l_name = F('staff_1__last_name'))
+                .annotate(staff_2_f_name = F('staff_2__first_name'))
+                .annotate(staff_2_l_name = F('staff_2__last_name'))
+                )
+            d["binomes"] = d["binomes"].values()
+            d["binomes"] = json.dumps(list(d["binomes"]), default=date_handler)
             return render(request, 'binomes.html', d)
 
         try:
@@ -53,6 +63,15 @@ def binome(request):
                 .exclude(notavailable__isnull=True)
                 .annotate(section_name = F('section__designation'))
                 .order_by("first_name"))
+            d["message_to_user"] = message_to_user
+            d["binomes"] = (Binome.objects.all()
+                .annotate(staff_1_f_name = F('staff_1__first_name'))
+                .annotate(staff_1_l_name = F('staff_1__last_name'))
+                .annotate(staff_2_f_name = F('staff_2__first_name'))
+                .annotate(staff_2_l_name = F('staff_2__last_name'))
+                )
+            d["binomes"] = d["binomes"].values()
+            d["binomes"] = json.dumps(list(d["binomes"]), default=date_handler)
             return render(request, 'binomes.html', d)
 
     	#We create a binome
@@ -76,6 +95,8 @@ def binome(request):
     d["binomes"] = d["binomes"].values()
 
     d["binomes"] = json.dumps(list(d["binomes"]), default=date_handler)
+
+    d["message_to_user"] = message_to_user
 
 
     return render(request, 'binomes.html', d)

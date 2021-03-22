@@ -476,7 +476,7 @@ def transfer_mail_1(request):
 
         tranfer_staff_email = request.user.email
 
-        send_mail(e_mail_subject, e_mail_body, e_mail_sender, [e_mail_receiver, tranfer_staff_email,])
+        #send_mail(e_mail_subject, e_mail_body, e_mail_sender, [e_mail_receiver, tranfer_staff_email,])
 
     the_connected_user = request.user
     d["senders"] = Sender.objects.all().order_by("first_name")
@@ -580,7 +580,7 @@ def save_transfer_1(request):
 
         tranfer_staff_email = request.user.email
 
-        send_mail(e_mail_subject, e_mail_body, e_mail_sender, [e_mail_receiver, tranfer_staff_email,])
+        #send_mail(e_mail_subject, e_mail_body, e_mail_sender, [e_mail_receiver, tranfer_staff_email,])
 
         return HttpResponse(response_data, content_type="application/json")
 

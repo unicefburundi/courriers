@@ -246,7 +246,7 @@ def stat_not_closed_mails(request):
     d = {}
     current_date = datetime.datetime.now().date()
 
-    not_closed_pie_data = (Mail.objects.filter(closed = "False")
+    not_closed_pie_data = (Mail.objects.filter(closed = False)
         .annotate(processing_time=DiffDays(CastDate(current_date)-CastDate(F('received_time'))) + 1)
         .values('processing_time')
         .annotate(number_same_time=Count('processing_time')))
@@ -254,7 +254,7 @@ def stat_not_closed_mails(request):
     d["not_closed_pie_data"] = not_closed_pie_data.order_by('processing_time')
 
     not_closed_pie_data_2 = (Track.objects.select_related()
-        .filter(end_date__isnull=True, mail__closed = "False")
+        .filter(end_date__isnull=True, mail__closed = False)
         .annotate(received_date=F('mail__received_time'))
         .annotate(need_answer=F('mail__need_answer'))
         .annotate(staff_f_name=F('staff__first_name'))
@@ -265,7 +265,7 @@ def stat_not_closed_mails(request):
     d["not_closed_pie_data_2"] = not_closed_pie_data_2
 
     not_closed_pie_data_3 = (Track.objects.select_related()
-        .filter(end_date__isnull=True, mail__closed = "False")
+        .filter(end_date__isnull=True, mail__closed = False)
         .annotate(received_date=F('mail__received_time'))
         .annotate(staff_f_name=F('staff__first_name'))
         .annotate(staff_l_name=F('staff__last_name'))
@@ -283,7 +283,7 @@ def stat_not_closed_mails(request):
 
 
     not_closed_mails_2 = (Track.objects.select_related()
-        .filter(end_date__isnull=True, mail__closed = "False")
+        .filter(end_date__isnull=True, mail__closed = False)
         .annotate(mail_internal_number=F('mail__number'))
         .annotate(mail_type=F('mail__mail_type__mail_type_name'))
         .annotate(recorded_date=F('mail__received_time'))
@@ -708,7 +708,7 @@ def get_on_process_mails_for_staff(request, staff_id):
     mails_under_processing = {}
     staff_id = int(request.GET.get("staff_id", ""))
     mails_under_processing["mails"] = (Track.objects.select_related()
-        .filter(end_date__isnull=True, mail__closed = "False", staff__id = staff_id)
+        .filter(end_date__isnull=True, mail__closed = False, staff__id = staff_id)
         .annotate(received_by_organization_date=F('mail__received_time'))
         .annotate(sender_f_name=F('mail__sender__first_name'))
         .annotate(sender_l_name=F('mail__sender__last_name'))

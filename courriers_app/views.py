@@ -410,6 +410,8 @@ def transfer_mail_1(request):
         else:
             hard_copy_transfer_date = datetime.datetime.now()
 
+        task_end_date = datetime.datetime.now()
+
         sender_record = Sender.objects.filter(id=sender)
         mail_record = Mail.objects.filter(number=mail)
         staff_record = Staff.objects.filter(id=staff)
@@ -423,8 +425,10 @@ def transfer_mail_1(request):
 
         mail_related_track_records = Track.objects.filter(mail = mail_record)
         last = mail_related_track_records[len(mail_related_track_records) - 1] if mail_related_track_records else None
+
         if last is not None:
-            last.end_date = hard_copy_transfer_date
+            #last.end_date = hard_copy_transfer_date
+            last.end_date = task_end_date
             last.save()
         else:
             pass
@@ -476,7 +480,7 @@ def transfer_mail_1(request):
 
         tranfer_staff_email = request.user.email
 
-        #send_mail(e_mail_subject, e_mail_body, e_mail_sender, [e_mail_receiver, tranfer_staff_email,])
+        send_mail(e_mail_subject, e_mail_body, e_mail_sender, [e_mail_receiver, tranfer_staff_email,])
 
     the_connected_user = request.user
     d["senders"] = Sender.objects.all().order_by("first_name")
@@ -580,7 +584,7 @@ def save_transfer_1(request):
 
         tranfer_staff_email = request.user.email
 
-        #send_mail(e_mail_subject, e_mail_body, e_mail_sender, [e_mail_receiver, tranfer_staff_email,])
+        send_mail(e_mail_subject, e_mail_body, e_mail_sender, [e_mail_receiver, tranfer_staff_email,])
 
         return HttpResponse(response_data, content_type="application/json")
 

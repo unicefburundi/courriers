@@ -485,7 +485,7 @@ def transfer_mail_1(request):
     the_connected_user = request.user
     d["senders"] = Sender.objects.all().order_by("first_name")
     d["staff"] = Staff.objects.all().annotate(section_name = F('section__designation')).order_by("section_name")
-    d["transfers"] = (Track.objects.filter(end_date__isnull = True, staff__user = the_connected_user)
+    d["transfers"] = (Track.objects.filter(end_date__isnull = True, mail__closed = False , staff__user = the_connected_user)
         .annotate(sender_f_name = F('mail__sender__first_name'))
         .annotate(sender_l_name = F('mail__sender__last_name'))
         .annotate(mail_number = F('mail__number'))

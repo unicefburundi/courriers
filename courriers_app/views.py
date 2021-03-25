@@ -13,6 +13,7 @@ import unicodedata
 from django.core.mail import send_mail
 
 from django.core.files.storage import FileSystemStorage
+from django.db.models import Max
 
 
 
@@ -485,7 +486,33 @@ def transfer_mail_1(request):
     the_connected_user = request.user
     d["senders"] = Sender.objects.all().order_by("first_name")
     d["staff"] = Staff.objects.all().annotate(section_name = F('section__designation')).order_by("section_name")
-    d["transfers"] = (Track.objects.filter(end_date__isnull = True, mail__closed = False , staff__user = the_connected_user)
+    
+    '''d["transfers"] = (Track.objects.filter(end_date__isnull = True, mail__closed = False , staff__user = the_connected_user)
+        .annotate(sender_f_name = F('mail__sender__first_name'))
+        .annotate(sender_l_name = F('mail__sender__last_name'))
+        .annotate(mail_number = F('mail__number'))
+        .annotate(staff_f_name = F('staff__first_name'))
+        .annotate(staff_l_name = F('staff__last_name'))
+        .annotate(section = F('staff__section__designation'))
+        )'''
+
+    '''d["transfers"] = (Mail.objects.filter(closed = False)
+        .annotate(max_date = Max("track__start_date"))
+        .filter(track__staff__user = the_connected_user, track__start_date = F('max_date'))
+        .annotate(sender_f_name = F('track__mail__sender__first_name'))
+        .annotate(sender_l_name = F('track__mail__sender__last_name'))
+        .annotate(mail_number = F('track__mail__number'))
+        .annotate(staff_f_name = F('track__staff__first_name'))
+        .annotate(staff_l_name = F('track__staff__last_name'))
+        .annotate(section = F('track__staff__section__designation'))
+        .annotate(hard_copy_transfer_time = F('track__hard_copy_transfer_time'))
+        .annotate(purpose = F('track__purpose'))
+        .annotate(start_date = F('track__start_date'))
+        )'''
+
+    d["transfers"] = (Track.objects.filter(mail__closed = False)
+        .annotate(max_date = Max("mail__track__start_date"))
+        .filter(staff__user = the_connected_user, start_date = F('max_date'))
         .annotate(sender_f_name = F('mail__sender__first_name'))
         .annotate(sender_l_name = F('mail__sender__last_name'))
         .annotate(mail_number = F('mail__number'))
@@ -493,7 +520,9 @@ def transfer_mail_1(request):
         .annotate(staff_l_name = F('staff__last_name'))
         .annotate(section = F('staff__section__designation'))
         )
+
     d["transfers"] = d["transfers"].values()
+
     d["transfers"] = json.dumps(list(d["transfers"]), default=date_handler)
     return render(request, 'transfer_1.html', d)
 

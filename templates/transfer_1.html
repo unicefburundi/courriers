@@ -65,10 +65,19 @@
 										sender = records.json[i]["sender_f_name"];
 										mail_number = records.json[i]["mail_number"];
 										//transfer_date = records.json[i]["start_date"];
-										hard_copy_transfer_date = records.json[i]["hard_copy_transfer_time"];
-										if(hard_copy_transfer_date){
+										
+										/*hard_copy_transfer_date = records.json[i]["hard_copy_transfer_time"];*/
+
+										start_date = records.json[i]["start_date"];
+
+										/*if(hard_copy_transfer_date){
 											hard_copy_transfer_date = hard_copy_transfer_date.substring(0,19);
+										}*/
+
+										if(start_date){
+											start_date = start_date.substring(0,19);
 										}
+
 										staff = records.json[i]["staff_f_name"];
 										section = records.json[i]["section"];
 										action = records.json[i]["purpose"];
@@ -80,7 +89,8 @@
 										
 										$('#tbl tr:last').append('<td align="center">' + mail_number +'</td>');
 										$('#tbl tr:last').append('<td align="center">' + sender +'</td>');
-										$('#tbl tr:last').append('<td align="center">' + hard_copy_transfer_date +'</td>');
+										/*$('#tbl tr:last').append('<td align="center">' + hard_copy_transfer_date +'</td>');*/
+										$('#tbl tr:last').append('<td align="center">' + start_date +'</td>');
 										$('#tbl tr:last').append('<td align="center">' + staff +'</td>');
 										$('#tbl tr:last').append('<td align="center">' + section +'</td>');
 										$('#tbl tr:last').append('<td align="center">' + action +'</td>');

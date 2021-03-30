@@ -254,8 +254,20 @@ def stat_not_closed_mails(request):
     d["number_of_not_completed_mails"] = Mail.objects.filter(closed = "False").count()
     d["not_closed_pie_data"] = not_closed_pie_data.order_by('processing_time')
 
-    not_closed_pie_data_2 = (Track.objects.select_related()
+
+    '''not_closed_pie_data_2 = (Track.objects.select_related()
         .filter(end_date__isnull=True, mail__closed = False)
+        .annotate(received_date=F('mail__received_time'))
+        .annotate(need_answer=F('mail__need_answer'))
+        .annotate(staff_f_name=F('staff__first_name'))
+        .annotate(staff_l_name=F('staff__last_name'))
+        .annotate(staff_section=F('staff__section__designation'))
+        .values('staff_section')
+        .annotate(number_of_mails_in_section=Count('staff_section')))'''
+    not_closed_pie_data_2 = (Track.objects.select_related()
+        .filter(mail__closed = False)
+        .annotate(max_date = Max("mail__track__start_date"))
+        .filter(start_date = F('max_date'))
         .annotate(received_date=F('mail__received_time'))
         .annotate(need_answer=F('mail__need_answer'))
         .annotate(staff_f_name=F('staff__first_name'))
@@ -265,8 +277,20 @@ def stat_not_closed_mails(request):
         .annotate(number_of_mails_in_section=Count('staff_section')))
     d["not_closed_pie_data_2"] = not_closed_pie_data_2
 
-    not_closed_pie_data_3 = (Track.objects.select_related()
+
+
+    '''not_closed_pie_data_3 = (Track.objects.select_related()
         .filter(end_date__isnull=True, mail__closed = False)
+        .annotate(received_date=F('mail__received_time'))
+        .annotate(staff_f_name=F('staff__first_name'))
+        .annotate(staff_l_name=F('staff__last_name'))
+        .annotate(staff_section=F('staff__section__designation'))
+        .values('staff__id', 'staff__first_name', 'staff__last_name', 'staff__section__designation')
+        .annotate(number_of_mails_for_one_staff=Count('staff__first_name')))'''
+    not_closed_pie_data_3 = (Track.objects.select_related()
+        .filter(mail__closed = False)
+        .annotate(max_date = Max("mail__track__start_date"))
+        .filter(start_date = F('max_date'))
         .annotate(received_date=F('mail__received_time'))
         .annotate(staff_f_name=F('staff__first_name'))
         .annotate(staff_l_name=F('staff__last_name'))
@@ -274,6 +298,8 @@ def stat_not_closed_mails(request):
         .values('staff__id', 'staff__first_name', 'staff__last_name', 'staff__section__designation')
         .annotate(number_of_mails_for_one_staff=Count('staff__first_name')))
     d["not_closed_pie_data_3"] = not_closed_pie_data_3
+
+
 
     not_closed_mails = (Mail.objects.filter(closed = False)
         .annotate(sender_f_name = F('sender__first_name'))
@@ -283,8 +309,23 @@ def stat_not_closed_mails(request):
     d['not_closed_mails'] = json.dumps(list(not_closed_mails), default=date_handler)
 
 
-    not_closed_mails_2 = (Track.objects.select_related()
+    '''not_closed_mails_2 = (Track.objects.select_related()
         .filter(end_date__isnull=True, mail__closed = False)
+        .annotate(mail_internal_number=F('mail__number'))
+        .annotate(mail_type=F('mail__mail_type__mail_type_name'))
+        .annotate(recorded_date=F('mail__received_time'))
+        .annotate(sender_f_name = F('mail__sender__first_name'))
+        .annotate(sender_l_name = F('mail__sender__last_name'))
+        .annotate(need_answer=F('mail__need_answer'))
+        .annotate(staff_f_name=F('staff__first_name'))
+        .annotate(staff_l_name=F('staff__last_name'))
+        .annotate(staff_section=F('staff__section__designation'))
+        .annotate(number_of_days_in_the_system=DiffDays(CastDate(current_date)-CastDate(F('mail__received_time'))) + 1)
+        ).values()'''
+    not_closed_mails_2 = (Track.objects.select_related()
+        .filter(mail__closed = False)
+        .annotate(max_date = Max("mail__track__start_date"))
+        .filter(start_date = F('max_date'))
         .annotate(mail_internal_number=F('mail__number'))
         .annotate(mail_type=F('mail__mail_type__mail_type_name'))
         .annotate(recorded_date=F('mail__received_time'))

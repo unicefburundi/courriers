@@ -688,8 +688,18 @@ def get_unclosed_mails(request):
             sender = sender[0]
             the_connected_user = request.user
             if(the_connected_user.groups.filter(name__in = ['Receptionist']).exists()):
-                mails = (Track.objects.filter(end_date__isnull = True, 
+                '''mails = (Track.objects.filter(end_date__isnull = True, 
                     mail__sender = sender)
+                    .annotate(sender_f_name = F('mail__sender__first_name'))
+                    .annotate(sender_l_name = F('mail__sender__last_name'))
+                    .annotate(number = F('mail__number'))
+                    .annotate(staff_f_name = F('staff__first_name'))
+                    .annotate(staff_l_name = F('staff__last_name'))
+                    .annotate(section = F('staff__section__designation'))
+                    )'''
+                mails = (Track.objects.filter(mail__closed = False, mail__sender = sender)
+                    .annotate(max_date = Max("mail__track__start_date"))
+                    .filter(start_date = F('max_date'))
                     .annotate(sender_f_name = F('mail__sender__first_name'))
                     .annotate(sender_l_name = F('mail__sender__last_name'))
                     .annotate(number = F('mail__number'))
@@ -698,9 +708,19 @@ def get_unclosed_mails(request):
                     .annotate(section = F('staff__section__designation'))
                     )
             else:
-                mails = (Track.objects.filter(end_date__isnull = True, 
+                '''mails = (Track.objects.filter(end_date__isnull = True, 
                     staff__user = the_connected_user, 
                     mail__sender = sender)
+                    .annotate(sender_f_name = F('mail__sender__first_name'))
+                    .annotate(sender_l_name = F('mail__sender__last_name'))
+                    .annotate(number = F('mail__number'))
+                    .annotate(staff_f_name = F('staff__first_name'))
+                    .annotate(staff_l_name = F('staff__last_name'))
+                    .annotate(section = F('staff__section__designation'))
+                    )'''
+                mails = (Track.objects.filter(mail__closed = False, mail__sender = sender)
+                    .annotate(max_date = Max("mail__track__start_date"))
+                    .filter(staff__user = the_connected_user, start_date = F('max_date'))
                     .annotate(sender_f_name = F('mail__sender__first_name'))
                     .annotate(sender_l_name = F('mail__sender__last_name'))
                     .annotate(number = F('mail__number'))

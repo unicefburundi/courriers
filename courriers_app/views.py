@@ -701,6 +701,7 @@ def search_mail(request):
         mail_history = json.dumps(list(mail_history), default=date_handler)
     return HttpResponse(mail_history, content_type="application/json")
 
+
 def close_mail(request):
     response_data = {}
     if request.method == 'POST':

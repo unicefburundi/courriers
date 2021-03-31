@@ -447,6 +447,7 @@ def transfer_mail_1(request):
         staff = request.POST.get('staff')
         hard_copy_transfer_date = request.POST.get('hard_copy_transfer_date')
         comments = request.POST.get('comments')
+        comments = comments.strip()
         soft_copy = request.FILES['soft_copy'] if 'soft_copy' in request.FILES else False
 
         #If datetime about when a soft copy has been uploaded is not available, we consider 

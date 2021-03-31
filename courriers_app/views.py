@@ -470,64 +470,67 @@ def transfer_mail_1(request):
         if len(staff_record) > 0:
             staff_record = staff_record[0]
 
-        mail_related_track_records = Track.objects.filter(mail = mail_record)
+        mail_related_track_records = Track.objects.filter(mail = mail_record).order_by("id")
         last = mail_related_track_records[len(mail_related_track_records) - 1] if mail_related_track_records else None
 
         if last is not None:
             #last.end_date = hard_copy_transfer_date
             last.end_date = task_end_date
             last.save()
-        else:
-            pass
+            if last.staff != staff_record:
+                #We can not transfer a mail to someone if it is already there
+                #If a soft copy is not uploaded, we consider the last related soft copy if it is available
+                soft_copy_available = False
+                if not soft_copy:
+                    last_mails_record_with_soft_copy = Track.objects.filter(mail = mail_record, soft_copy__isnull = False).order_by("-id")
+                    if(len(last_mails_record_with_soft_copy) < 1):
+                        last_mails_record_with_soft_copy = Mail.objects.filter(number = mail, soft_copy__isnull = False)
 
-        #If a soft copy is not uploaded, we consider the last related soft copy if it is available
-        soft_copy_available = False
-        if not soft_copy:
-            last_mails_record_with_soft_copy = Track.objects.filter(mail = mail_record, soft_copy__isnull = False).order_by("-id")
-            if(len(last_mails_record_with_soft_copy) < 1):
-                last_mails_record_with_soft_copy = Mail.objects.filter(number = mail, soft_copy__isnull = False)
-
-            if(len(last_mails_record_with_soft_copy) > 0):
-                soft_copy_available = True
-                soft_copy = last_mails_record_with_soft_copy[0].soft_copy
-        else:
-            soft_copy_available = True
+                    if(len(last_mails_record_with_soft_copy) > 0):
+                        soft_copy_available = True
+                        soft_copy = last_mails_record_with_soft_copy[0].soft_copy
+                else:
+                    soft_copy_available = True
 
 
-        if soft_copy_available:
-            Track.objects.create(
-                mail = mail_record,
-                staff = staff_record,
-                hard_copy_transfer_time = hard_copy_transfer_date,
-                purpose = comments,
-                soft_copy = soft_copy
-                )
-        else:
-            Track.objects.create(
-                mail = mail_record, 
-                staff = staff_record, 
-                hard_copy_transfer_time = hard_copy_transfer_date, 
-                purpose = comments
-                )
+                if soft_copy_available:
+                    Track.objects.create(
+                        mail = mail_record,
+                        staff = staff_record,
+                        hard_copy_transfer_time = hard_copy_transfer_date,
+                        purpose = comments,
+                        soft_copy = soft_copy
+                        )
+                else:
+                    Track.objects.create(
+                        mail = mail_record, 
+                        staff = staff_record, 
+                        hard_copy_transfer_time = hard_copy_transfer_date, 
+                        purpose = comments
+                        )
 
-        mail_external_number = mail_record.external_number
-        mail_internal_number = mail_record.number
+                mail_external_number = mail_record.external_number
+                mail_internal_number = mail_record.number
 
-        e_mail_body = ("Dear "+staff_record.first_name+", "+
-            "a mail with "+mail_external_number+" as external number "+
-            "and "+mail_internal_number+" as internal number "+
-            "has been sent to you for processing. "+
-            "Best regards.")
+                e_mail_body = ("Dear "+staff_record.first_name+", "+
+                    "a mail with "+mail_external_number+" as external number "+
+                    "and "+mail_internal_number+" as internal number "+
+                    "has been sent to you for processing. "+
+                    "Best regards.")
 
-        e_mail_subject = "Push and Track - A mail has been sent to you for processing"
+                e_mail_subject = "Push and Track - A mail has been sent to you for processing"
 
-        e_mail_sender = "noreply@pushandtrack.org"
+                e_mail_sender = "noreply@pushandtrack.org"
 
-        e_mail_receiver = staff_record.user.email
+                e_mail_receiver = staff_record.user.email
 
-        tranfer_staff_email = request.user.email
+                tranfer_staff_email = request.user.email
 
-        send_mail(e_mail_subject, e_mail_body, e_mail_sender, [e_mail_receiver, tranfer_staff_email,])
+                send_mail(e_mail_subject, e_mail_body, e_mail_sender, [e_mail_receiver, tranfer_staff_email,])
+            else:
+                #Write here a code you want to be executed if staff A is trying to transfer a mail 
+                #to staff B while the mail is already to staff B
+                pass
 
     the_connected_user = request.user
     d["senders"] = Sender.objects.all().order_by("first_name")

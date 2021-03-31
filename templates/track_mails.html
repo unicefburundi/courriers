@@ -48,7 +48,7 @@
 							'</tbody>');*/
 
 							$('#tbl').append('<thead>' +
-								'<th>{% trans "Internal Number" %}</th><th>{% trans "External Number" %}</th><th>{% trans "Staff" %}</th><th>{% trans "Section" %}</th><th>{% trans "Required Action" %}</th><th>{% trans "Reception Date" %}</th><th>{% trans "Soft Copy" %}</th>' +
+								'<th>{% trans "Internal Number" %}</th><th>{% trans "External Number" %}</th><th>{% trans "Sender" %}</th><th>{% trans "Received by Staff" %}</th><th>{% trans "Staff Section" %}</th><th>{% trans "Reception Date" %}</th><th>{% trans "Required Action" %}</th><th>{% trans "Soft Copy" %}</th>' +
 							'</thead>' +
 								
 							'<tbody>' +
@@ -63,6 +63,7 @@
 		                		staff_section = response[i].staff_section;
 		                		required_action = response[i].purpose;
 		                		soft_copy = response[i].soft_copy;
+		                		sender = response[i].sender_f_name;
 
 		                		//reception_date = response[i].hard_copy_transfer_time;
 		                		reception_date = response[i].start_date;
@@ -82,13 +83,16 @@
 
 		                		$('#tbl tr:last').append('<td align="center">' + external_number +'</td>');
 
+		                		$('#tbl tr:last').append('<td align="center">' + sender +'</td>');
+
 								$('#tbl tr:last').append('<td align="center">' + staff_name +'</td>');
 
 								$('#tbl tr:last').append('<td align="center">' + staff_section +'</td>');
-								$('#tbl tr:last').append('<td align="center">' + required_action +'</td>');
+
 								$('#tbl tr:last').append('<td align="center">' + reception_date +'</td>');
 
-
+								$('#tbl tr:last').append('<td align="center">' + required_action +'</td>');
+								
 								if(soft_copy){
 					                      $('#tbl tr:last').append('<td align="center"><a href="{{ MEDIA_URL }}'+ soft_copy +'">Soft Copy</a></td>');
 					                    }else{

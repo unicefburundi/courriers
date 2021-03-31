@@ -685,6 +685,8 @@ def search_mail(request):
                     .annotate(received_date=F('mail__received_time'))
                     .annotate(internal_number=F('mail__number'))
                     .annotate(external_number=F('mail__external_number'))
+                    .annotate(sender_f_name = F('mail__sender__first_name'))
+                    .annotate(sender_l_name = F('mail__sender__last_name'))
                     .annotate(staff_f_name=F('staff__first_name'))
                     .annotate(staff_l_name=F('staff__last_name'))
                     .annotate(staff_section=F('staff__section__designation'))

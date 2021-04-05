@@ -298,7 +298,7 @@ def stat_not_closed_mails(request):
         .values('staff__id', 'staff__first_name', 'staff__last_name', 'staff__section__designation')
         .annotate(number_of_mails_for_one_staff=Count('staff__first_name')))
     d["not_closed_pie_data_3"] = not_closed_pie_data_3'''
-    not_closed_pie_data_3 = Track.objects.filter(mail__closed = False).annotate(max_date = Max("mail__track__start_date")).filter(start_date = F('max_date')).annotate(received_date=F('mail__received_time')).annotate(staff_f_name=F('staff__first_name')).annotate(staff_l_name=F('staff__last_name')).annotate(staff_section=F('staff__section__designation')).values('staff__id', 'staff__first_name', 'staff__last_name', 'staff__section__designation').annotate(number_of_mails_for_one_staff=Count('staff__first_name'))
+    not_closed_pie_data_3 = Track.objects.filter(mail__closed = False).annotate(max_date = Max("mail__track__start_date")).values('staff__id', 'staff__first_name', 'staff__last_name', 'staff__section__designation').annotate(number_of_mails_for_one_staff=Count('staff__first_name'))
     d["not_closed_pie_data_3"] = not_closed_pie_data_3
     
 

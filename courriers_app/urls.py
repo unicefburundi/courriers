@@ -29,4 +29,6 @@ urlpatterns = [
         views.get_on_process_mails_for_staff, 
         name='get_on_process_mails_for_staff'
         ),
+    url(r'^all_mails$', views.MailListView.as_view(), name='all_mails'),
+    url(r'^all_mails_types$', views.MailTypeListView.as_view(), name='all_mails_types'),
 ]

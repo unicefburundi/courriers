@@ -14,6 +14,9 @@ from django.core.mail import send_mail
 
 from django.core.files.storage import FileSystemStorage
 from django.db.models import Max
+from django.views.generic import ListView
+from courriers_app.tables import *
+from django_tables2 import SingleTableView
 
 
 
@@ -817,3 +820,21 @@ def get_on_process_mails_for_staff(request, staff_id):
     mails_under_processing["mails"] = mails_under_processing["mails"].values()
     mails_under_processing["mails"] = json.dumps(list(mails_under_processing["mails"]), default=date_handler)
     return render(request, "on_process_mails_for_staff.html", mails_under_processing)
+
+
+
+
+
+
+class MailListView(SingleTableView):
+    model = Mail
+    table_pagination = False
+    mails_table = MailTable
+    template_name = 'all_mails.html'
+
+
+class MailTypeListView(SingleTableView):
+    model = MailType
+    table_pagination = False
+    mail_type_table = MailTypeTable
+    template_name = 'all_mail_types.html'

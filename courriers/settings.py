@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django_bootstrap_base_template',
     'import_export',
     'binome',
+    'django_tables2'
 ]
 
 MIDDLEWARE = [

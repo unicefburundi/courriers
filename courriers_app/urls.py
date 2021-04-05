@@ -31,4 +31,9 @@ urlpatterns = [
         ),
     url(r'^all_mails$', views.MailListView.as_view(), name='all_mails'),
     url(r'^all_mails_types$', views.MailTypeListView.as_view(), name='all_mails_types'),
+    url(r'^all_sections$', views.SectionListView.as_view(), name='all_sections'),
+    url(r'^all_senders$', views.SenderListView.as_view(), name='all_senders'),
+    url(r'^all_staff_positions$', views.StaffPositionListView.as_view(), name='all_staff_positions'),
+    url(r'^all_staffs$', views.StaffListView.as_view(), name='all_staffs'),
+    url(r'^all_tracks$', views.TrackListView.as_view(), name='all_tracks'),
 ]

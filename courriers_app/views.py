@@ -838,3 +838,35 @@ class MailTypeListView(SingleTableView):
     table_pagination = False
     mail_type_table = MailTypeTable
     template_name = 'all_mail_types.html'
+
+class SectionListView(SingleTableView):
+    model = Section
+    table_pagination = False
+    section_table = SectionTable
+    template_name = 'all_sections.html'
+
+
+class SenderListView(SingleTableView):
+    model = Sender
+    table_pagination = False
+    sender_table = SenderTable
+    template_name = 'all_senders.html'
+
+
+class StaffPositionListView(SingleTableView):
+    model = StaffPosition
+    table_pagination = False
+    staff_position_table = StaffPosition
+    template_name = 'all_staff_positions.html'
+
+class StaffListView(SingleTableView):
+    model = Staff
+    table_pagination = False
+    staff_table = StaffTable
+    template_name = 'all_staffs.html'
+
+class TrackListView(SingleTableView):
+    model = Track
+    table_pagination = False
+    track_table = TrackTable
+    template_name = 'all_tracks.html'

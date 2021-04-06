@@ -40,6 +40,6 @@ class StaffTable(tables.Table):
 
 class TrackTable(tables.Table):
 	class Meta:
-		#model = Track
-		sequence = ("mail__id", "staff__id", )
+		model = Track
+		fields = ("mail__id", "staff__id", )
 		template_name = "all_tracks.html"

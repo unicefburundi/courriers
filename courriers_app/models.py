@@ -16,7 +16,7 @@ class Sender(models.Model):
     phone_number = models.CharField(max_length=50, null=True)
 
     def __unicode__(self):
-        return "{0} - Tel : {1}".format(self.first_name, self.phone_number)
+        return "{0} - Tel : {1} - Sender ID : {2}".format(self.first_name, self.phone_number, self.id)
 
 
 class StaffPosition(models.Model):
@@ -24,14 +24,14 @@ class StaffPosition(models.Model):
     designation = models.CharField(max_length=50)
 
     def __unicode__(self):
-        return "{0}".format(self.designation)
+        return "{0} - Staff Position ID : {1}".format(self.designation, self.id)
 
 class Section(models.Model):
     '''In this model, we will store sections'''
     designation = models.CharField(max_length=50)
 
     def __unicode__(self):
-        return "{0}".format(self.designation)
+        return "{0} - Section ID : {1}".format(self.designation, self.id)
 
 class Staff(models.Model):
     '''In this model, we will store Staff details'''

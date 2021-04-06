@@ -45,7 +45,7 @@ class Staff(models.Model):
     mobile_phone_number = models.CharField(max_length=20, null=True)
 
     def __unicode__(self):
-        return "{0} {1} - {2}".format(self.first_name, self.last_name, self.user.email)
+        return "{0} {1} - {2} - Staff id {3}".format(self.first_name, self.last_name, self.user.email, self.id)
 
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
@@ -63,7 +63,7 @@ class MailType(models.Model):
     mail_type_name = models.CharField(max_length=50)
 
     def __unicode__(self):
-        return "{0}".format(self.mail_type_name)
+        return "{0} - Mail type id {1}".format(self.mail_type_name, self.id)
 
 class Mail(models.Model):
     '''In this model, we will store mails and invoices'''
@@ -81,7 +81,7 @@ class Mail(models.Model):
     soft_copy = models.FileField(upload_to ='uploads/', null=True)
 
     def __unicode__(self):
-        return "{0} - Mail type : {1} - Registered {2} - Isclosed {3}".format(self.sender.first_name, self.mail_type.mail_type_name, self.received_time, self.closed)
+        return "{0} - Mail type : {1} - Registered {2} - Isclosed {3} - Mail id {4} - Sender id {5} - Mail Type id {6}".format(self.sender.first_name, self.mail_type.mail_type_name, self.received_time, self.closed, self.id, self.sender.id, self.mail_type.id)
 
 class Track(models.Model):
     '''In this model, we will record wherever a mail went through'''
@@ -94,4 +94,4 @@ class Track(models.Model):
     soft_copy = models.FileField(upload_to ='uploads/', null=True)
 
     def __unicode__(self):
-        return "{0} [Registered {1}] - {2} - Start {3} - End {4}".format(self.mail.sender.first_name, self.mail.received_time, self.staff.first_name, self.start_date, self.end_date)
+        return "{0} [Registered {1}] - {2} - Start {3} - End {4} - Mail id {5} - Staff id {6}".format(self.mail.sender.first_name, self.mail.received_time, self.staff.first_name, self.start_date, self.end_date, self.mail.id, self.staff.id)

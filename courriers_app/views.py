@@ -473,8 +473,10 @@ def transfer_mail_1(request):
         if len(staff_record) > 0:
             staff_record = staff_record[0]
 
+
         mail_related_track_records = Track.objects.filter(mail = mail_record).order_by("id")
         last = mail_related_track_records[len(mail_related_track_records) - 1] if mail_related_track_records else None
+
 
         if last is not None:
             #last.end_date = hard_copy_transfer_date
@@ -488,13 +490,11 @@ def transfer_mail_1(request):
                     last_mails_record_with_soft_copy = Track.objects.filter(mail = mail_record, soft_copy__isnull = False).order_by("-id")
                     if(len(last_mails_record_with_soft_copy) < 1):
                         last_mails_record_with_soft_copy = Mail.objects.filter(number = mail, soft_copy__isnull = False)
-
                     if(len(last_mails_record_with_soft_copy) > 0):
                         soft_copy_available = True
                         soft_copy = last_mails_record_with_soft_copy[0].soft_copy
                 else:
                     soft_copy_available = True
-
 
                 if soft_copy_available:
                     Track.objects.create(

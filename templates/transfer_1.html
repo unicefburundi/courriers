@@ -48,7 +48,8 @@
 										
 									'</tbody>');
 
-									var records = JSON.parse("{{transfers}}".replace(/&quot;/g,'"'));
+									//var records = JSON.parse("{{transfers}}".replace(/&quot;/g,'"'));
+									var records = JSON.parse("{{transfers}}".replace(/&quot;/g,'"').replace(/\r/g," ").replace(/\n/g," "));
 
 									records = { json: records };
 

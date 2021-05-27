@@ -1,5 +1,5 @@
 from django.conf.urls import include, url
-from . import views
+from . import views, tasks
 
 urlpatterns = [
     url(r'^$', views.landing, name='landing'),
@@ -36,4 +36,7 @@ urlpatterns = [
     url(r'^all_staff_positions$', views.StaffPositionListView.as_view(), name='all_staff_positions'),
     url(r'^all_staffs$', views.StaffListView.as_view(), name='all_staffs'),
     url(r'^all_tracks$', views.TrackListView.as_view(), name='all_tracks'),
+    url(r'^alert_for_pending_invoices_1$', tasks.alert_for_pending_invoices_1, name='alert_for_pending_invoices_1'),
+    url(r'^alert_for_pending_mails_1$', tasks.alert_for_pending_mails_1, name='alert_for_pending_mails_1'),
+    url(r'^alert_for_pending_dct_1$', tasks.alert_for_pending_dct_1, name='alert_for_pending_dct_1'),
 ]

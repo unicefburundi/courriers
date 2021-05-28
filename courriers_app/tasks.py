@@ -5,10 +5,31 @@ from django.db.models import F, Q
 import unicodedata
 from django.core.mail import send_mail
 from django.db.models import Max
+from threading import Thread
+from django.views.decorators.csrf import csrf_exempt
+from jsonview.decorators import json_view
 
 
-
+@csrf_exempt
+@json_view
 def alert_for_pending_invoices_1(request):
+	"""This function receives requests sent by RapidPro. 
+	This function send json data to RapidPro as a response."""
+
+	print(">>>>>>>>>>>>>>>>>>>>>Beginning of alert_for_pending_invoices_1<<<<<<<<<<<<<<<<<<<<")
+
+	Thread(target=alert_for_pending_invoices_1_woker).start()
+
+	print(">>>>>>>>>>>>>>>>>>>>>End of alert_for_pending_invoices_1<<<<<<<<<<<<<<<<<<<<")
+
+	response = {}
+
+	response["info_to_contact"] = "Ok"
+
+	return response
+
+
+def alert_for_pending_invoices_1_woker():
 	''' This function informs a staff that there is/are (an) invoice(s) pending on his/her desk '''
 	invoice_accepted_proc_days_set = Settings.objects.filter(setting_name = "INVOICE_ACCEPTED_PROC_DAYS_1")
 	if len(invoice_accepted_proc_days_set) < 1:
@@ -20,16 +41,6 @@ def alert_for_pending_invoices_1(request):
 	invoice_accepted_proc_days = int(invoice_accepted_proc_days_record.setting_value)
 
 	minimum_registration_date = datetime.datetime.now().date() - datetime.timedelta(days=invoice_accepted_proc_days)
-
-	'''all_concerned_invoinces = (
-		Track.objects.filter(end_date__isnull = True,
-			mail__closed = False,
-			mail__mail_type__mail_type_name__iexact = "invoice",
-			mail__recorded_time__lte = minimum_registration_date)
-		.annotate(staff_f_name = F('staff__first_name'))
-		.annotate(email = F('staff__user__email'))
-		.annotate(mail_number = F('mail__number'))
-		).values()'''
 
 	all_concerned_invoinces = (
 		Track.objects.filter(mail__closed = False)
@@ -93,8 +104,6 @@ def alert_for_pending_invoices_1(request):
 					print(e_mail_body)
 					send_mail(e_mail_subject, e_mail_body, e_mail_sender, [e_mail_receiver,])
 
-	d = {}
-	return render(request, 'landing_page.html', d)
 
 
 
@@ -104,7 +113,28 @@ def alert_for_pending_invoices_1(request):
 
 
 
+
+@csrf_exempt
+@json_view
 def alert_for_pending_mails_1(request):
+	"""This function receives requests sent by RapidPro. 
+	This function send json data to RapidPro as a response."""
+
+	print(">>>>>>>>>>>>>>>>>>>>>Beginning of alert_for_pending_mails_1<<<<<<<<<<<<<<<<<<<<")
+
+	Thread(target=alert_for_pending_mails_1_worker).start()
+
+	print(">>>>>>>>>>>>>>>>>>>>>End of alert_for_pending_mails_1<<<<<<<<<<<<<<<<<<<<")
+
+	response = {}
+
+	response["info_to_contact"] = "Ok"
+
+	return response
+
+
+
+def alert_for_pending_mails_1_worker():
 	''' This function informs a staff that there is/are (a) mail(s) pending on his/her desk '''
 	mail_accepted_proc_days_set = Settings.objects.filter(setting_name = "MAIL_ACCEPTED_PROC_DAYS_1")
 	if len(mail_accepted_proc_days_set) < 1:
@@ -116,17 +146,6 @@ def alert_for_pending_mails_1(request):
 	mail_accepted_proc_days = int(mail_accepted_proc_days_record.setting_value)
 
 	minimum_registration_date = datetime.datetime.now().date() - datetime.timedelta(days=mail_accepted_proc_days)
-
-	'''all_concerned_mails = (
-		Track.objects.filter(Q(mail__mail_type__mail_type_name__iexact = "DCT")
-			| Q(mail__mail_type__mail_type_name__iexact = "mail"),
-			end_date__isnull = True,
-			mail__closed = False,
-			mail__recorded_time__lte = minimum_registration_date)
-		.annotate(staff_f_name = F('staff__first_name'))
-		.annotate(email = F('staff__user__email'))
-		.annotate(mail_number = F('mail__number'))
-		).values()'''
 
 	all_concerned_mails = (
 		Track.objects.filter(mail__closed = False)
@@ -190,14 +209,36 @@ def alert_for_pending_mails_1(request):
 					print(e_mail_body)
 					send_mail(e_mail_subject, e_mail_body, e_mail_sender, [e_mail_receiver,])
 
-	d = {}
-	return render(request, 'landing_page.html', d)
 
 
 
 
 
+
+
+
+
+@csrf_exempt
+@json_view
 def alert_for_pending_dct_1(request):
+	"""This function receives requests sent by RapidPro. 
+	This function send json data to RapidPro as a response."""
+
+	print(">>>>>>>>>>>>>>>>>>>>>Beginning of alert_for_pending_dct_1<<<<<<<<<<<<<<<<<<<<")
+
+	Thread(target=alert_for_pending_dct_1_worker).start()
+
+	print(">>>>>>>>>>>>>>>>>>>>>End of alert_for_pending_dct_1<<<<<<<<<<<<<<<<<<<<")
+
+	response = {}
+
+	response["info_to_contact"] = "Ok"
+
+	return response
+
+
+
+def alert_for_pending_dct_1_worker():
 	''' This function informs a staff that there is/are (a) mail(s) pending on his/her desk '''
 	mail_accepted_proc_days_set = Settings.objects.filter(setting_name = "MAIL_ACCEPTED_PROC_DAYS_1")
 	if len(mail_accepted_proc_days_set) < 1:
@@ -209,17 +250,6 @@ def alert_for_pending_dct_1(request):
 	mail_accepted_proc_days = int(mail_accepted_proc_days_record.setting_value)
 
 	minimum_registration_date = datetime.datetime.now().date() - datetime.timedelta(days=mail_accepted_proc_days)
-
-	'''all_concerned_mails = (
-		Track.objects.filter(Q(mail__mail_type__mail_type_name__iexact = "DCT")
-			| Q(mail__mail_type__mail_type_name__iexact = "mail"),
-			end_date__isnull = True,
-			mail__closed = False,
-			mail__recorded_time__lte = minimum_registration_date)
-		.annotate(staff_f_name = F('staff__first_name'))
-		.annotate(email = F('staff__user__email'))
-		.annotate(mail_number = F('mail__number'))
-		).values()'''
 
 	all_concerned_mails = (
 		Track.objects.filter(mail__closed = False)
@@ -282,6 +312,3 @@ def alert_for_pending_dct_1(request):
 				if not the_concerned_staff.is_deleted:
 					print(e_mail_body)
 					send_mail(e_mail_subject, e_mail_body, e_mail_sender, [e_mail_receiver,])
-
-	d = {}
-	return render(request, 'landing_page.html', d)

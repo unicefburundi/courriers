@@ -206,7 +206,7 @@ def alert_for_pending_mails_1_worker():
 			if(len(the_concerned_staff_set) > 0):
 				the_concerned_staff = the_concerned_staff_set[0]
 				if not the_concerned_staff.is_deleted:
-					print(e_mail_body)
+					print(e_mail_body.encode('utf-8'))
 					send_mail(e_mail_subject, e_mail_body, e_mail_sender, [e_mail_receiver,])
 
 
@@ -310,5 +310,5 @@ def alert_for_pending_dct_1_worker():
 			if(len(the_concerned_staff_set) > 0):
 				the_concerned_staff = the_concerned_staff_set[0]
 				if not the_concerned_staff.is_deleted:
-					print(e_mail_body)
+					print(e_mail_body.encode('utf-8'))
 					send_mail(e_mail_subject, e_mail_body, e_mail_sender, [e_mail_receiver,])

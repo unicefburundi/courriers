@@ -752,7 +752,7 @@ def get_unclosed_mails(request):
                     .annotate(staff_l_name = F('staff__last_name'))
                     .annotate(section = F('staff__section__designation'))
                     )'''
-                mails = (Track.objects.filter(mail__closed = False, mail__sender = sender)
+                mails = (Track.objects.filter(mail__closed = False, mail__sender = sender).order_by("mail__number")
                     .annotate(max_date = Max("mail__track__start_date"))
                     .filter(start_date = F('max_date'))
                     .annotate(sender_f_name = F('mail__sender__first_name'))
@@ -773,7 +773,7 @@ def get_unclosed_mails(request):
                     .annotate(staff_l_name = F('staff__last_name'))
                     .annotate(section = F('staff__section__designation'))
                     )'''
-                mails = (Track.objects.filter(mail__closed = False, mail__sender = sender)
+                mails = (Track.objects.filter(mail__closed = False, mail__sender = sender).order_by("mail__number")
                     .annotate(max_date = Max("mail__track__start_date"))
                     .filter(staff__user = the_connected_user, start_date = F('max_date'))
                     .annotate(sender_f_name = F('mail__sender__first_name'))

@@ -519,7 +519,9 @@ def transfer_mail_1(request):
                     "a mail with "+mail_external_number+" as external number "+
                     "and "+mail_internal_number+" as internal number "+
                     "has been sent to you for processing. "+
-                    "Best regards.")
+                    "You mail find more details on the following link. "+
+                    "https://courriers.unicefburundi.org/transfer_mail_1 "+
+                    "Best regards")
 
                 e_mail_subject = "Push and Track - A mail has been sent to you for processing"
 

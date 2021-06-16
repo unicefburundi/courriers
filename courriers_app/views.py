@@ -672,6 +672,7 @@ def save_transfer_1(request):
 def track_mails(request):
     d = {}
     d["pagetitle"] = "Track mails"
+    d["senders"] = Sender.objects.all().order_by("first_name")
     return render(request, 'track_mails.html', d)
 
 def search_mail(request):
@@ -732,6 +733,33 @@ def close_mail(request):
             else:
                 pass
     return HttpResponse(response_data, content_type="application/json")
+
+
+def get_all_mails(request):
+    response_data = {}
+    if request.method == 'POST':
+        json_data = json.loads(request.body)
+        sender_id = json_data['code']
+        sender = Sender.objects.filter(id=sender_id)
+        if len(sender) > 0:
+            sender = sender[0]
+            the_connected_user = request.user
+            mails = (Track.objects.filter(mail__sender = sender).order_by("mail__number")
+                .annotate(max_date = Max("mail__track__start_date"))
+                .filter(start_date = F('max_date'))
+                .annotate(sender_f_name = F('mail__sender__first_name'))
+                .annotate(sender_l_name = F('mail__sender__last_name'))
+                .annotate(number = F('mail__number'))
+                .annotate(staff_f_name = F('staff__first_name'))
+                .annotate(staff_l_name = F('staff__last_name'))
+                .annotate(section = F('staff__section__designation'))
+                )
+            mails = mails.values()
+            mails = json.dumps(list(mails), default=date_handler)
+
+    return HttpResponse(mails, content_type="application/json")
+
+
 
 def get_unclosed_mails(request):
     response_data = {}

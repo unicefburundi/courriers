@@ -5,6 +5,51 @@
 
 {% block head %}
 	<script language="JavaScript">
+		$(document).ready(function() {
+
+			if ("{{ senders }}") {
+				{% for s in senders %}
+					$('#sender').append('<option value="{{ s.id }}">{{ s.first_name }} {{s.last_name}}</option>');
+				{% endfor %}
+			}
+
+		});
+
+		function fetchmails(code) {
+			$("#mail option").each(function(){
+        		if ($(this).val()) {
+        			$(this).remove();
+        		}
+		    });
+
+		    $('#records_tbl').empty();
+			if (code) {
+				//initializesonic();
+
+				ajaxurl = 'get_all_mails';
+				ajaxpostbackfunction = "fetch_mails";
+	            data = JSON.stringify({ 'code': code });
+
+	            ajaxpost(ajaxurl, data);
+	        }
+
+	        //desplay_records();
+		}
+
+
+		function fetch_mail_history(code) {
+		    $('#records_tbl').empty();
+			if (code) {
+				ajaxurl = 'search_mail';
+				ajaxpostbackfunction = "fetch_mail_history";
+	            data = JSON.stringify({ 'mail_id': code });
+
+	            ajaxpost(ajaxurl, data);
+	        }
+	        //desplay_records();
+
+		}
+
 
 		function searchMail(){
 			$("#records_tbl").html("");
@@ -31,94 +76,106 @@
 		            url: posturl,
 		            data: data,
 		            success: function (response) {
-		            	if(response != "N"){
 
-							$('#records_tbl').append('<p align="center"><b>{% trans "DETAILS" %}</b></p>' +
+		            	if (ajaxpostbackfunction == "fetch_mails") {
+		                	for (i = 0; i < response.length; i++) {
 
-													'<div style="clear:both; height:10px;"></div>' +
+		                		var id = response[i]["number"];
 
-													'<table id="tbl" class="table table-striped table-bordered table-condensed">');
-													
-							/*$('#tbl').append('<thead>' +
-								'<th>{% trans "Internal Number" %}</th><th>{% trans "External Number" %}</th><th>{% trans "Staff" %}</th><th>{% trans "Section" %}</th><th>{% trans "Required Action" %}</th><th>{% trans "Reception Date" %}</th><th>{% trans "End Date" %}</th>' +
-							'</thead>' +
-								
-							'<tbody>' +
-								
-							'</tbody>');*/
+		                		$('#mail').append('<option value=' + id +'>' + id + '</option>');
 
-							$('#tbl').append('<thead>' +
-								'<th>{% trans "Internal Number" %}</th><th>{% trans "External Number" %}</th><th>{% trans "Sender" %}</th><th>{% trans "Received by Staff" %}</th><th>{% trans "Staff Section" %}</th><th>{% trans "Reception Date" %}</th><th>{% trans "Required Action" %}</th><th>{% trans "Soft Copy" %}</th>' +
-							'</thead>' +
-								
-							'<tbody>' +
-								
-							'</tbody>');
+    						}
+    						// fetch wanted data
+		                }else{
+				            	if (ajaxpostbackfunction == "fetch_mail_history") {
+
+									$('#records_tbl').append('<p align="center"><b>{% trans "DETAILS" %}</b></p>' +
+
+															'<div style="clear:both; height:10px;"></div>' +
+
+															'<table id="tbl" class="table table-striped table-bordered table-condensed">');
+															
+									/*$('#tbl').append('<thead>' +
+										'<th>{% trans "Internal Number" %}</th><th>{% trans "External Number" %}</th><th>{% trans "Staff" %}</th><th>{% trans "Section" %}</th><th>{% trans "Required Action" %}</th><th>{% trans "Reception Date" %}</th><th>{% trans "End Date" %}</th>' +
+									'</thead>' +
+										
+									'<tbody>' +
+										
+									'</tbody>');*/
+
+									$('#tbl').append('<thead>' +
+										'<th>{% trans "Internal Number" %}</th><th>{% trans "External Number" %}</th><th>{% trans "Sender" %}</th><th>{% trans "Received by Staff" %}</th><th>{% trans "Staff Section" %}</th><th>{% trans "Reception Date" %}</th><th>{% trans "Required Action" %}</th><th>{% trans "Soft Copy" %}</th>' +
+									'</thead>' +
+										
+									'<tbody>' +
+										
+									'</tbody>');
 
 
-							for (i = 0; i < response.length; i++) {
-								internal_number = response[i].internal_number;
-								external_number = response[i].external_number;
-		                		staff_name = response[i].staff_f_name+" "+response[i].staff_l_name;
-		                		staff_section = response[i].staff_section;
-		                		required_action = response[i].purpose;
-		                		soft_copy = response[i].soft_copy;
-		                		sender = response[i].sender_f_name;
+									for (i = 0; i < response.length; i++) {
+										internal_number = response[i].internal_number;
+										external_number = response[i].external_number;
+				                		staff_name = response[i].staff_f_name+" "+response[i].staff_l_name;
+				                		staff_section = response[i].staff_section;
+				                		required_action = response[i].purpose;
+				                		soft_copy = response[i].soft_copy;
+				                		sender = response[i].sender_f_name;
 
-		                		//reception_date = response[i].hard_copy_transfer_time;
-		                		reception_date = response[i].start_date;
-								if(reception_date){
-									reception_date = reception_date.substring(0,19);
+				                		//reception_date = response[i].hard_copy_transfer_time;
+				                		reception_date = response[i].start_date;
+										if(reception_date){
+											reception_date = reception_date.substring(0,19);
+										}
+
+				                		end_date = response[i].end_date
+				                		if(end_date != null){
+				                			end_date = end_date.substring(0,19);
+				                		}
+				                		
+
+				                		$('#tbl').find('tbody').append('<tr style="cursor:pointer;"></tr>');
+
+				                		$('#tbl tr:last').append('<td align="center">' + internal_number +'</td>');
+
+				                		$('#tbl tr:last').append('<td align="center">' + external_number +'</td>');
+
+				                		$('#tbl tr:last').append('<td align="center">' + sender +'</td>');
+
+										$('#tbl tr:last').append('<td align="center">' + staff_name +'</td>');
+
+										$('#tbl tr:last').append('<td align="center">' + staff_section +'</td>');
+
+										$('#tbl tr:last').append('<td align="center">' + reception_date +'</td>');
+
+										$('#tbl tr:last').append('<td align="center">' + required_action +'</td>');
+										
+										if(soft_copy){
+							                      $('#tbl tr:last').append('<td align="center"><a href="{{ MEDIA_URL }}'+ soft_copy +'">Soft Copy</a></td>');
+							                    }else{
+							                      $('#tbl tr:last').append('<td align="center">No Soft Copy</td>');
+							                    }
+									}
+
+
+
+									$('#tbl').DataTable({
+													dom: "<'row'<'col-sm-3'l><'col-sm-4'i><'col-sm-5'f>>" +
+														"<'row'<'col-sm-12'tr>>" +
+														"<'row'<'col-sm-4'B><'col-sm-8'p>>",
+													pagingType: "full_numbers",
+													lengthMenu: [
+											            [10, 25, 50, 100, -1 ],
+											            ['10', '25', '50', '100', 'All' ]
+											        ],
+											        buttons: [
+											            'copy', 'csv', 'excel', 'pdf', 'print'
+											        ],
+											        order: [[5, 'asc']]
+												});
+								}else{
+									$('#records_tbl').append('<p align="center"><b style="color:red;">{% trans "No Records found" %}</b></p>');
 								}
-
-		                		end_date = response[i].end_date
-		                		if(end_date != null){
-		                			end_date = end_date.substring(0,19);
-		                		}
-		                		
-
-		                		$('#tbl').find('tbody').append('<tr style="cursor:pointer;"></tr>');
-
-		                		$('#tbl tr:last').append('<td align="center">' + internal_number +'</td>');
-
-		                		$('#tbl tr:last').append('<td align="center">' + external_number +'</td>');
-
-		                		$('#tbl tr:last').append('<td align="center">' + sender +'</td>');
-
-								$('#tbl tr:last').append('<td align="center">' + staff_name +'</td>');
-
-								$('#tbl tr:last').append('<td align="center">' + staff_section +'</td>');
-
-								$('#tbl tr:last').append('<td align="center">' + reception_date +'</td>');
-
-								$('#tbl tr:last').append('<td align="center">' + required_action +'</td>');
-								
-								if(soft_copy){
-					                      $('#tbl tr:last').append('<td align="center"><a href="{{ MEDIA_URL }}'+ soft_copy +'">Soft Copy</a></td>');
-					                    }else{
-					                      $('#tbl tr:last').append('<td align="center">No Soft Copy</td>');
-					                    }
-							}
-
-
-
-							$('#tbl').DataTable({
-											dom: "<'row'<'col-sm-3'l><'col-sm-4'i><'col-sm-5'f>>" +
-												"<'row'<'col-sm-12'tr>>" +
-												"<'row'<'col-sm-4'B><'col-sm-8'p>>",
-											pagingType: "full_numbers",
-											lengthMenu: [
-									            [10, 25, 50, 100, -1 ],
-									            ['10', '25', '50', '100', 'All' ]
-									        ],
-									        buttons: [
-									            'copy', 'csv', 'excel', 'pdf', 'print'
-									        ],
-									        order: [[5, 'asc']]
-										});
-						}else{
-							$('#records_tbl').append('<p align="center"><b style="color:red;">{% trans "No Records found" %}</b></p>');
-						}
+					}
 
 
 
@@ -155,10 +212,10 @@
 			<form method="post" enctype="multipart/form-data">
 			{% csrf_token %}
 			<div>
-				<div class="row">
+				<!--<div class="row">
 
 					<div class="col-30">
-              		</div>
+              		</div>-->
 
               		<!--<div class="col-20">
               		</div>-->
@@ -167,20 +224,64 @@
 						<label class="custom-file-label" for="mail_id">{% trans "ID :" %}</label>
 					</div>-->
 
-					<div class="col-40">
+					<!--<div class="col-40">
 						<textarea class="form-control" id="mail_id" style="text-align: center;" required="required" placeholder="Type here a mail internal number"></textarea>
-					</div>
+					</div>-->
 
 					<!--<div class="col-20">
               		</div>-->
 
-              		<div class="col-30">
+              		<!--<div class="col-30">
+              		</div>
+
+				    </div>-->
+
+
+				<div class="row">
+
+					<div class="col-10">
+              		</div>
+
+              		<div class="col-40">
+						<label for="sender">{% trans "Sender:" %}</label>
+					</div>
+
+					<div class="col-40">
+						<select id="sender" class="form-control" style="width:140px"  onchange="fetchmails(this.value)" required="required" name="sender">
+							<option value="" selected="selected">[ {% trans "Select the sender" %} ]</option>'
+						</select>
+					</div>
+
+					<div class="col-10">
               		</div>
 
 				</div>
+
+
+				<div class="row">
+
+					<div class="col-10">
+              		</div>
+
+              		<div class="col-40">
+						<label for="mail">{% trans "Mail/Invoice:" %}</label>
+					</div>
+
+					<div class="col-40">
+						<select id="mail" class="form-control" style="width:140px"  onchange="fetch_mail_history(this.value)" required="required" name="mail">
+							<option value="" selected="selected">[ {% trans "Select a mail" %} ]</option>'
+						</select>
+					</div>
+
+					<div class="col-10">
+              		</div>
+
+				</div>
+
+
 			
 				<div class="row">
-					<div class="col-30">
+					<!--<div class="col-30">
               		</div>
 
               		<div class="col-40-center">
@@ -188,7 +289,7 @@
 					</div>
 
 					<div class="col-30">
-              		</div>
+              		</div>-->
 				</div>
 
 			</div>

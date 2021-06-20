@@ -530,7 +530,8 @@ def transfer_mail_1(request):
 
                 e_mail_subject = "Push and Track - A mail has been sent to you for processing"
 
-                e_mail_sender = "noreply@pushandtrack.org"
+                #e_mail_sender = "noreply@pushandtrack.org"
+                e_mail_sender = "noreply@unicef.org"
 
                 e_mail_receiver = staff_record.user.email
 
@@ -667,7 +668,7 @@ def save_transfer_1(request):
 
         e_mail_subject = "Push and Track - A mail has been sent to you for processing"
 
-        e_mail_sender = "noreply@pushandtrack.org"
+        e_mail_sender = "noreply@unicef.org"
 
         e_mail_receiver = staff_record.user.email
 

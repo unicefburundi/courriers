@@ -23,8 +23,6 @@ PROJECT_ROOT = os.path.abspath(os.path.join(PROJECT_PATH, os.pardir))
 # See https://docs.djangoproject.com/en/1.11/howto/deployment/checklist/
 
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
 
 
 # Application definition

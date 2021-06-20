@@ -91,7 +91,7 @@ def alert_for_pending_invoices_1_woker():
 
 			e_mail_subject = "Push and Track - Alert on voices last serval days under processing"
 
-			e_mail_sender = "noreply@pushandtrack.org"
+			e_mail_sender = "noreply@unicef.org"
 
 			e_mail_receiver = concerned_staffs[one_email]["staff_email"]
 
@@ -196,7 +196,7 @@ def alert_for_pending_mails_1_worker():
 
 			e_mail_subject = "Push and Track - Alert on voices last serval days under processing"
 
-			e_mail_sender = "noreply@pushandtrack.org"
+			e_mail_sender = "noreply@unicef.org"
 
 			e_mail_receiver = concerned_staffs[one_email]["staff_email"]
 
@@ -300,7 +300,7 @@ def alert_for_pending_dct_1_worker():
 
 			e_mail_subject = "Push and Track - Alert on voices last serval days under processing"
 
-			e_mail_sender = "noreply@pushandtrack.org"
+			e_mail_sender = "noreply@unicef.org"
 
 			e_mail_receiver = concerned_staffs[one_email]["staff_email"]
 

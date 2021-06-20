@@ -683,6 +683,7 @@ def track_mails(request):
     d["senders"] = Sender.objects.all().order_by("first_name")
     return render(request, 'track_mails.html', d)
 
+'''
 def search_mail(request):
     mail_history = ""
     if request.method == 'POST':
@@ -715,6 +716,33 @@ def search_mail(request):
             mail_history = mail_history.values()
         else:
             mail_history = "N"
+        mail_history = json.dumps(list(mail_history), default=date_handler)
+    return HttpResponse(mail_history, content_type="application/json")
+'''
+
+def search_mail(request):
+    mail_history = ""
+    if request.method == 'POST':
+        json_data = json.loads(request.body)
+        mail_id = json_data['mail_id']
+        mail_id = mail_id.strip()
+        concerned_mail = Mail.objects.filter(~Q(track = None), number = mail_id)
+        if(len(concerned_mail) > 0):
+            concerned_mail = concerned_mail[0]
+            sender = concerned_mail.sender
+            received_time = concerned_mail.received_time
+            one_mail_history = (
+                Track.objects.filter(mail = concerned_mail).order_by('start_date')
+                .annotate(received_date=F('mail__received_time'))
+                .annotate(internal_number=F('mail__number'))
+                .annotate(external_number=F('mail__external_number'))
+                .annotate(sender_f_name = F('mail__sender__first_name'))
+                .annotate(sender_l_name = F('mail__sender__last_name'))
+                .annotate(staff_f_name=F('staff__first_name'))
+                .annotate(staff_l_name=F('staff__last_name'))
+                .annotate(staff_section=F('staff__section__designation'))
+            )
+            mail_history = one_mail_history.values()
         mail_history = json.dumps(list(mail_history), default=date_handler)
     return HttpResponse(mail_history, content_type="application/json")
 

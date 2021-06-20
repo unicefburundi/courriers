@@ -17,6 +17,8 @@ from django.db.models import Max
 from django.views.generic import ListView
 from courriers_app.tables import *
 from django_tables2 import SingleTableView
+from email.mime.text import MIMEText
+from django.contrib.auth.decorators import login_required
 
 
 
@@ -442,6 +444,7 @@ def transfer_mail(request):
     return render(request, 'transfer.html', d)
 
 
+@login_required(login_url='login/')
 def transfer_mail_1(request):
     d = {}
     if request.method == 'POST':
@@ -515,13 +518,15 @@ def transfer_mail_1(request):
                 mail_external_number = mail_record.external_number
                 mail_internal_number = mail_record.number
 
-                e_mail_body = ("Dear "+staff_record.first_name+", "+
-                    "a mail with "+mail_external_number+" as external number "+
-                    "and "+mail_internal_number+" as internal number "+
-                    "has been sent to you for processing. "+
-                    "You mail find more details on the following link. "+
-                    "https://courriers.unicefburundi.org/transfer_mail_1 "+
-                    "Best regards")
+                e_mail_body = ("Dear "+staff_record.first_name+
+                    ", \n a mail with "+mail_external_number+
+                    " as external number and "+
+                    mail_internal_number+
+                    " as internal number \n has been sent to you for processing. "+
+                    "Please, click on the link below for more details. \n "+
+                    "https://courriers.unicefburundi.org/transfer_mail_1 . \n Best regards."
+                    )
+
 
                 e_mail_subject = "Push and Track - A mail has been sent to you for processing"
 
@@ -563,6 +568,7 @@ def transfer_mail_1(request):
         .annotate(purpose = F('track__purpose'))
         .annotate(start_date = F('track__start_date'))
         )'''
+
 
     d["transfers"] = (Track.objects.filter(mail__closed = False)
         .annotate(max_date = Max("mail__track__start_date"))

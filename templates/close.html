@@ -28,9 +28,14 @@
 			}else{
 				return;
 			}
+			if ($('#comments').val() != ""){
+				comments = $('#comments').val();
+			}else{
+				return;
+			}
 
 			ajaxurl = 'close_mail';
-			data = JSON.stringify({ 'sender': sender, 'mail': mail});
+			data = JSON.stringify({ 'sender': sender, 'mail': mail, 'comments': comments});
 
 
 			$("#records_tbl").html("");
@@ -160,6 +165,42 @@
 
 			</div>
 
+
+			<div class="row">
+
+		        	<div class="col-10">
+              		</div>
+
+              		<div class="col-40">
+						<label for="comments">{% trans "Closure Reason:" %}</label>
+					</div>
+
+					<div class="col-40">
+						<textarea class="form-control" style="width:140px" id="comments" required="required" name="comments"></textarea>
+					</div>
+
+					<div class="col-10">
+              		</div>
+
+			</div>
+
+			<!--<div class="row">
+
+					<div class="col-10">
+              		</div>
+
+              		<div class="col-40">
+		            	<label class="custom-file-label" for="softCopy">Soft Copy</label>
+		            </div>
+		              
+		            <div class="col-40">
+		             	<input type="file" class="custom-file-input" id="softCopy" name="soft_copy">
+		            </div>
+
+		            <div class="col-10">
+              		</div>
+
+			</div>-->
 
 			<div class="row">
 				<div class="col-45">

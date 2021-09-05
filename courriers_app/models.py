@@ -80,6 +80,7 @@ class Mail(models.Model):
     need_answer = models.BooleanField(default=False)
     answered = models.BooleanField(default=False)
     soft_copy = models.FileField(upload_to ='uploads/', null=True)
+    closure_reason = models.CharField(max_length=300, null=True)
 
     def __unicode__(self):
         return "{0} - Mail type : {1} - Registered {2} - Isclosed {3} - Mail id {4} - Sender id {5} - Mail Type id {6}".format(self.sender.first_name, self.mail_type.mail_type_name, self.received_time, self.closed, self.id, self.sender.id, self.mail_type.id)
@@ -90,7 +91,7 @@ class Track(models.Model):
     staff = models.ForeignKey(Staff)
     start_date = models.DateTimeField(auto_now_add=True, blank=True)
     hard_copy_transfer_time = models.DateTimeField(null=True)
-    purpose = models.CharField(max_length=100)
+    purpose = models.CharField(max_length=300)
     end_date = models.DateTimeField(blank=True, null=True)
     soft_copy = models.FileField(upload_to ='uploads/', null=True)
 

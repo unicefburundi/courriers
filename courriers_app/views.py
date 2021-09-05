@@ -531,7 +531,7 @@ def transfer_mail_1(request):
                 e_mail_subject = "Push and Track - A mail has been sent to you for processing"
 
                 #e_mail_sender = "noreply@pushandtrack.org"
-                e_mail_sender = "noreply@unicef.org"
+                e_mail_sender = "hbrdbujumbura@unicef.org"
 
                 e_mail_receiver = staff_record.user.email
 
@@ -668,7 +668,7 @@ def save_transfer_1(request):
 
         e_mail_subject = "Push and Track - A mail has been sent to you for processing"
 
-        e_mail_sender = "noreply@unicef.org"
+        e_mail_sender = "hbrdbujumbura@unicef.org"
 
         e_mail_receiver = staff_record.user.email
 
@@ -684,42 +684,7 @@ def track_mails(request):
     d["senders"] = Sender.objects.all().order_by("first_name")
     return render(request, 'track_mails.html', d)
 
-'''
-def search_mail(request):
-    mail_history = ""
-    if request.method == 'POST':
-        json_data = json.loads(request.body)
-        mail_id = json_data['mail_id']
-        mail_id = mail_id.strip()
-        concerned_mail = Mail.objects.filter(~Q(track = None), number__contains = mail_id)
-        if(len(concerned_mail) > 0):
-            first = True
-            for one_mail in concerned_mail:
-                sender = one_mail.sender
-                received_time = one_mail.received_time
-                one_mail_history = (
-                    Track.objects.filter(mail = one_mail).order_by('start_date')
-                    .annotate(received_date=F('mail__received_time'))
-                    .annotate(internal_number=F('mail__number'))
-                    .annotate(external_number=F('mail__external_number'))
-                    .annotate(sender_f_name = F('mail__sender__first_name'))
-                    .annotate(sender_l_name = F('mail__sender__last_name'))
-                    .annotate(staff_f_name=F('staff__first_name'))
-                    .annotate(staff_l_name=F('staff__last_name'))
-                    .annotate(staff_section=F('staff__section__designation'))
-                )
-                #one_mail_history = mail_history.values()
-                if first == True:
-                    mail_history = one_mail_history
-                    first = False
-                else:
-                    mail_history = mail_history | one_mail_history
-            mail_history = mail_history.values()
-        else:
-            mail_history = "N"
-        mail_history = json.dumps(list(mail_history), default=date_handler)
-    return HttpResponse(mail_history, content_type="application/json")
-'''
+from django.utils.safestring import mark_safe
 
 def search_mail(request):
     mail_history = ""
@@ -732,6 +697,9 @@ def search_mail(request):
             concerned_mail = concerned_mail[0]
             sender = concerned_mail.sender
             received_time = concerned_mail.received_time
+            is_closed = concerned_mail.closed
+            closure_reason = concerned_mail.closure_reason
+            closure_date = concerned_mail.closed_time
             one_mail_history = (
                 Track.objects.filter(mail = concerned_mail).order_by('start_date')
                 .annotate(received_date=F('mail__received_time'))
@@ -744,8 +712,14 @@ def search_mail(request):
                 .annotate(staff_section=F('staff__section__designation'))
             )
             mail_history = one_mail_history.values()
-        mail_history = json.dumps(list(mail_history), default=date_handler)
-    return HttpResponse(mail_history, content_type="application/json")
+            mail_history = json.dumps(list(mail_history), default=date_handler)
+            mail_informations = json.dumps({"mail_is_closed" : is_closed, "closure_reason" : closure_reason, "closure_date" : closure_date}, default=date_handler)
+    data = {
+        "mail_informations" : mail_informations,
+        "mail_history" : mail_history
+    }
+    data = json.dumps(data, indent = 4)
+    return HttpResponse(data, content_type="application/json")
 
 
 def close_mail(request):
@@ -755,9 +729,11 @@ def close_mail(request):
         sender = int(json_data['sender'])
         mail = json_data['mail']
         the_mail = Mail.objects.filter(number = mail)
+        closure_reason = json_data['comments']
         if len(the_mail) > 0:
             the_mail = the_mail[0]
             the_mail.closed = True
+            the_mail.closure_reason = closure_reason
             the_mail.closed_time = datetime.datetime.now()
             the_mail.save()
 

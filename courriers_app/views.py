@@ -730,11 +730,13 @@ def close_mail(request):
         mail = json_data['mail']
         the_mail = Mail.objects.filter(number = mail)
         closure_reason = json_data['comments']
+        the_connected_user = request.user.staff
         if len(the_mail) > 0:
             the_mail = the_mail[0]
             the_mail.closed = True
             the_mail.closure_reason = closure_reason
             the_mail.closed_time = datetime.datetime.now()
+            the_mail.closed_by = the_connected_user
             the_mail.save()
 
             # Let's first record that the staff who was working on this mail finished his work

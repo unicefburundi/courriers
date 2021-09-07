@@ -81,6 +81,7 @@ class Mail(models.Model):
     answered = models.BooleanField(default=False)
     soft_copy = models.FileField(upload_to ='uploads/', null=True)
     closure_reason = models.CharField(max_length=300, null=True)
+    closed_by = models.ForeignKey(Staff, null=True)
 
     def __unicode__(self):
         return "{0} - Mail type : {1} - Registered {2} - Isclosed {3} - Mail id {4} - Sender id {5} - Mail Type id {6}".format(self.sender.first_name, self.mail_type.mail_type_name, self.received_time, self.closed, self.id, self.sender.id, self.mail_type.id)

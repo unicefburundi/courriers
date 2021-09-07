@@ -19,3 +19,4 @@ fixtures/
 *.sql
 static/
 media/
+other_urls.py
